@@ -105,16 +105,16 @@ export default function Dashboard() {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>STT</th>
                   <th>Sản phẩm</th>
                   <th>Tổng tiền</th>
                   <th>Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map(order => (
+                {recentOrders.map((order, index) => (
                   <tr key={order.id}>
-                    <td>#{order.id}</td>
+                    <td>{index + 1}</td>
                     <td className="order-items-cell">{order.items.map(i => i.title).join(', ')}</td>
                     <td className="price-cell">{formatPrice(order.total)}</td>
                     <td>

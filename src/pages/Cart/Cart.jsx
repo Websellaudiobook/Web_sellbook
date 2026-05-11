@@ -39,7 +39,7 @@ export default function Cart() {
             {cartItems.map(item => (
               <div key={item.id} className="cart-item card">
                 <Link to={`/books/${item.id}`} className="cart-item-image">
-                  <img src={item.image} alt={item.title} />
+                  <img src={item.image?.startsWith('http') ? item.image : `/${item.image}`} alt={item.title} />
                 </Link>
                 <div className="cart-item-info">
                   <Link to={`/books/${item.id}`} className="cart-item-title">{item.title}</Link>
@@ -48,7 +48,11 @@ export default function Cart() {
                     <div className="quantity-control">
                       <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><FiMinus /></button>
                       <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><FiPlus /></button>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        disabled={item.quantity >= item.stock}
+                        title={item.quantity >= item.stock ? 'Đã đạt số lượng tối đa trong kho' : ''}
+                      ><FiPlus /></button>
                     </div>
                     <span className="cart-item-price">{formatPrice(item.price * item.quantity)}</span>
                     <button className="cart-item-remove" onClick={() => removeFromCart(item.id)}>

@@ -12,7 +12,7 @@ export default function BookCard({ book }) {
     <div className="book-card card">
       <div className="book-card-image">
         <img
-          src={book.image}
+          src={book.image?.startsWith('http') ? book.image : `/${book.image}`}
           alt={book.title}
           loading="lazy"
           onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" fill="%231e1e2e"><rect width="300" height="400"/><text x="150" y="200" text-anchor="middle" fill="%23666" font-size="16">No Image</text></svg>' }}

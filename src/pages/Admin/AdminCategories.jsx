@@ -68,7 +68,7 @@ export default function AdminCategories() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>STT</th>
               <th>Ảnh</th>
               <th>Tên danh mục</th>
               <th>Mô tả</th>
@@ -76,9 +76,9 @@ export default function AdminCategories() {
             </tr>
           </thead>
           <tbody>
-            {categories.map(cat => (
+            {categories.map((cat, index) => (
               <tr key={cat.id}>
-                <td>{cat.id}</td>
+                <td>{index + 1}</td>
                 <td><img src={cat.image} alt="" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8 }} /></td>
                 <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{cat.name}</td>
                 <td>{cat.description}</td>
@@ -108,8 +108,11 @@ export default function AdminCategories() {
                 <textarea className="form-textarea" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
               <div className="form-group">
-                <label className="form-label">Link ảnh</label>
-                <input className="form-input" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." />
+                <label className="form-label">Đường dẫn ảnh bìa</label>
+                <input className="form-input" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="VD: images/Model_image/ten-anh.jpg hoặc https://..." />
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px', display: 'block' }}>
+                  Hỗ trợ đường dẫn cục bộ (nằm trong thư mục public) hoặc đường dẫn URL.
+                </small>
               </div>
               <div className="admin-form-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Hủy</button>

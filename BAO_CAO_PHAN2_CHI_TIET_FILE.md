@@ -277,4 +277,38 @@ Giỏ hàng → Thanh toán → Đặt hàng → Lịch sử mua hàng
 
 ---
 
+## 10. CẢI TIẾN & SỬA LỖI ĐÃ THỰC HIỆN
+
+### 10.1 Các tính năng đã bổ sung
+
+| Tính năng | Vị trí | Mô tả |
+|-----------|--------|-------|
+| **Multi-select danh mục** | `AdminBooks.jsx` | Thay dropdown đơn bằng checkbox group, cho phép chọn nhiều danh mục cho 1 sách |
+| **Tăng lượt bán tự động** | `AdminOrders.jsx` | Khi admin cập nhật đơn → "Đã giao", tự cộng thêm trường `sold` cho từng sách trong đơn |
+| **Sắp xếp theo lượt đánh giá** | `Home.jsx` | Sách nổi bật & bán chạy ưu tiên hiển thị cuốn nhiều lượt đánh giá nhất lên đầu |
+| **Chỉnh số sao & lượt đánh giá** | `AdminBooks.jsx` | Admin có thể tùy chỉnh trực tiếp `rating` và `reviews` từ form chỉnh sửa sách |
+| **Giới hạn số lượng theo kho** | `Cart.jsx` | Nút `+` bị vô hiệu hóa khi đã đạt đúng số lượng tồn kho của sách |
+| **Hỗ trợ ảnh URL & local** | Toàn bộ app | Tự động xử lý cả link `http://...` và đường dẫn `images/...` |
+
+### 10.2 Lỗi đã sửa
+
+| Lỗi | File | Cách sửa |
+|-----|------|---------|
+| **ID ngẫu nhiên** hiển thị lộn xộn trong bảng Admin | `AdminBooks`, `AdminCategories`, `AdminUsers`, `AdminOrders`, `Dashboard` | Đổi cột `ID` → cột `STT` (số thứ tự 1, 2, 3...) |
+| **Sách liên quan** không hiển thị do json-server không query được trong mảng | `BookDetail.jsx` | Fetch toàn bộ sách rồi filter client-side, hỗ trợ cả `categoryId` dạng số và mảng |
+| **Filter danh mục** không khớp khi sách có `categoryId` là mảng | `Books.jsx` | Cập nhật logic kiểm tra `Array.isArray()` trước khi so sánh |
+
+### 10.3 Ghi chú quan trọng về dữ liệu
+
+```
+Trường categoryId trong db.json hỗ trợ 2 định dạng tương thích nhau:
+
+Dạng số (sách cũ):     "categoryId": 1
+Dạng mảng (sách mới): "categoryId": [1, 3]
+
+→ Toàn bộ code đã được cập nhật xử lý cả 2 dạng này.
+```
+
+---
+
 *Báo cáo được tạo tự động - BookVerse Project © 2026*

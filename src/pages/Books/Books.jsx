@@ -53,7 +53,13 @@ export default function Books() {
         return true
       })
       .filter(book => {
-        if (selectedCategory) return book.categoryId === parseInt(selectedCategory)
+        if (selectedCategory) {
+          const catId = parseInt(selectedCategory)
+          if (Array.isArray(book.categoryId)) {
+            return book.categoryId.includes(catId)
+          }
+          return book.categoryId === catId
+        }
         return true
       })
       .filter(book => {

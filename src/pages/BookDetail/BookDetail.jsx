@@ -28,10 +28,15 @@ export default function BookDetail() {
       try {
         const res = await getBook(id)
         setBook(res.data)
-        // Optimized: fetch only books in same category instead of ALL books
-        const allBooks = await getBooks({ categoryId: res.data.categoryId })
+        // Fetch all books then filter client-side vì json-server không query được trong mảng categoryId
+        const catId = Array.isArray(res.data.categoryId) ? res.data.categoryId[0] : res.data.categoryId
+        const allBooks = await getBooks()
         const related = allBooks.data
-          .filter(b => b.id !== res.data.id)
+          .filter(b => {
+            if (b.id === res.data.id) return false
+            if (Array.isArray(b.categoryId)) return b.categoryId.includes(Number(catId))
+            return b.categoryId == catId
+          })
           .slice(0, 4)
         setRelatedBooks(related)
       } catch (err) {
@@ -94,7 +99,7 @@ export default function BookDetail() {
           <div className="detail-image-wrapper">
             <div className="detail-image">
               <img
-                src={book.image}
+                src={book.image?.startsWith('http') ? book.image : `/${book.image}`}
                 alt={book.title}
                 onError={(e) => { e.target.src = IMG_FALLBACK }}
               />

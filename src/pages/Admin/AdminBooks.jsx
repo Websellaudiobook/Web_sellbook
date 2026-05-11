@@ -8,7 +8,7 @@ import './Admin.css'
 
 const emptyBook = {
   title: '', author: '', description: '', price: '', originalPrice: '',
-  image: '', categoryId: '', stock: '', rating: 4.5, reviews: 0,
+  image: '', categoryId: [], stock: '', rating: 4.5, reviews: 0,
   publisher: '', publishYear: 2026, pages: '', language: 'Tiếng Việt',
   isbn: '', featured: false, bestseller: false
 }
@@ -40,7 +40,7 @@ export default function AdminBooks() {
       ...form,
       price: Number(form.price),
       originalPrice: Number(form.originalPrice),
-      categoryId: Number(form.categoryId),
+      categoryId: Array.isArray(form.categoryId) ? form.categoryId.map(Number) : [Number(form.categoryId)],
       stock: Number(form.stock),
       pages: Number(form.pages),
       publishYear: Number(form.publishYear),
@@ -53,6 +53,8 @@ export default function AdminBooks() {
         await updateBook(editId, data)
         toast.success('Cập nhật sách thành công!')
       } else {
+        const nextId = Math.max(0, ...books.map(b => parseInt(b.id) || 0)) + 1;
+        data.id = String(nextId);
         await createBook(data)
         toast.success('Thêm sách mới thành công!')
       }
@@ -82,7 +84,12 @@ export default function AdminBooks() {
     }
   }
 
-  const getCategoryName = (id) => categories.find(c => c.id === id)?.name || '—'
+  const getCategoryName = (catData) => {
+    if (Array.isArray(catData)) {
+      return catData.map(id => categories.find(c => c.id == id)?.name).filter(Boolean).join(', ')
+    }
+    return categories.find(c => c.id == catData)?.name || '—'
+  }
 
   return (
     <div className="page-enter">
@@ -97,7 +104,7 @@ export default function AdminBooks() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>STT</th>
               <th>Ảnh</th>
               <th>Tên sách</th>
               <th>Tác giả</th>
@@ -108,10 +115,10 @@ export default function AdminBooks() {
             </tr>
           </thead>
           <tbody>
-            {books.map(book => (
+            {books.map((book, index) => (
               <tr key={book.id}>
-                <td>{book.id}</td>
-                <td><img src={book.image} alt="" style={{ width: 40, height: 52, objectFit: 'cover', borderRadius: 4 }} /></td>
+                <td>{index + 1}</td>
+                <td><img src={book.image?.startsWith('http') ? book.image : `/${book.image}`} alt="" style={{ width: 40, height: 52, objectFit: 'cover', borderRadius: 4 }} /></td>
                 <td>
                   <div style={{ fontWeight: 500, color: 'var(--text-primary)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {book.title}
@@ -150,10 +157,25 @@ export default function AdminBooks() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">Danh mục *</label>
-                  <select className="form-select" name="categoryId" value={form.categoryId} onChange={handleChange} required>
-                    <option value="">Chọn danh mục</option>
-                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', padding: '8px 0' }}>
+                    {categories.map(c => (
+                      <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={Array.isArray(form.categoryId) ? form.categoryId.includes(Number(c.id)) : form.categoryId == c.id}
+                          onChange={(e) => {
+                            let current = Array.isArray(form.categoryId) ? [...form.categoryId] : (form.categoryId ? [Number(form.categoryId)] : []);
+                            if (e.target.checked) {
+                              if (!current.includes(Number(c.id))) current.push(Number(c.id));
+                            } else {
+                              current = current.filter(id => id != c.id);
+                            }
+                            setForm({ ...form, categoryId: current });
+                          }}
+                        /> {c.name}
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="form-group">
@@ -181,8 +203,11 @@ export default function AdminBooks() {
                 </div>
               </div>
               <div className="form-group">
-                <label className="form-label">Link ảnh bìa</label>
-                <input className="form-input" name="image" value={form.image} onChange={handleChange} placeholder="https://..." />
+                <label className="form-label">Đường dẫn ảnh bìa</label>
+                <input className="form-input" name="image" value={form.image} onChange={handleChange} placeholder="VD: images/Model_image/ten-anh.jpg hoặc https://..." />
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '4px', display: 'block' }}>
+                  Hỗ trợ đường dẫn cục bộ (nằm trong thư mục public) hoặc đường dẫn URL.
+                </small>
               </div>
               <div className="admin-form-row">
                 <div className="form-group">
@@ -202,6 +227,16 @@ export default function AdminBooks() {
                 <div className="form-group">
                   <label className="form-label">ISBN</label>
                   <input className="form-input" name="isbn" value={form.isbn} onChange={handleChange} />
+                </div>
+              </div>
+              <div className="admin-form-row">
+                <div className="form-group">
+                  <label className="form-label">Điểm đánh giá (1-5)</label>
+                  <input className="form-input" type="number" step="0.1" min="0" max="5" name="rating" value={form.rating} onChange={handleChange} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Số lượt đánh giá</label>
+                  <input className="form-input" type="number" min="0" name="reviews" value={form.reviews} onChange={handleChange} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 24, margin: '8px 0' }}>

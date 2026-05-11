@@ -196,3 +196,83 @@ npm run dev
 | GET | /orders?userId=X | Lấy đơn hàng theo user |
 | POST | /orders | Tạo đơn hàng |
 | PUT | /orders/:id | Cập nhật trạng thái đơn |
+
+---
+
+## 9. HƯỚNG DẪN SỬ DỤNG CHI TIẾT
+
+### 9.1 Dành cho Khách hàng (Client)
+
+#### 🛒 Mua sách
+1. Vào **Trang chủ** → xem sách nổi bật hoặc bán chạy
+2. Click **"Khám phá ngay"** hoặc vào menu **Sách** để xem toàn bộ
+3. Dùng **bộ lọc** bên trái: lọc theo danh mục, khoảng giá, hoặc tìm kiếm tên sách/tác giả
+4. Click vào sách → trang **Chi tiết** → chọn số lượng → nhấn **"Thêm vào giỏ hàng"**
+5. Vào **Giỏ hàng** → kiểm tra đơn → nhấn **"Tiến hành thanh toán"**
+6. ⚠️ **Cần đăng nhập** trước khi thanh toán
+
+#### 🔑 Đăng nhập / Đăng ký
+- **Đăng ký:** Điền đầy đủ thông tin → tự động đăng nhập luôn
+- **Đăng nhập demo nhanh:**
+  - Admin: `admin@bookstore.com` / `admin123`
+  - User: `user@bookstore.com` / `user123`
+- Session được lưu, không cần đăng nhập lại khi tải lại trang
+
+#### 📦 Xem đơn hàng
+- Đăng nhập → click tên → **"Lịch sử mua hàng"**
+- Xem trạng thái đơn hàng (màu sắc badge biểu thị trạng thái)
+
+---
+
+### 9.2 Dành cho Quản trị viên (Admin)
+
+#### 🔐 Truy cập trang Admin
+1. Đăng nhập bằng tài khoản admin (`admin@bookstore.com` / `admin123`)
+2. Click tên → **"Quản trị"** → vào trang `/admin`
+
+#### 📚 Quản lý Sách
+- **Xem danh sách:** Bảng hiển thị STT, ảnh, tên, tác giả, danh mục, giá, kho
+- **Thêm sách mới:** Nhấn **"+ Thêm sách mới"** → điền form → Lưu
+  - **Ảnh sách:** Nhập URL (ví dụ từ Tiki, Shopee) hoặc đường dẫn local (`images/Model_image/ten-anh.jpg`)
+  - **Danh mục:** Tick chọn 1 hoặc nhiều danh mục (multi-select checkbox)
+  - **Điểm đánh giá:** Nhập số từ 0.0 đến 5.0 (ví dụ: 4.8)
+  - **Số lượt đánh giá:** Nhập số lượt (ví dụ: 2450)
+- **Sửa sách:** Nhấn icon ✏️ → form tự điền dữ liệu sẵn → Cập nhật
+- **Xóa sách:** Nhấn icon 🗑️ → xác nhận
+
+#### 🗂️ Quản lý Danh mục
+- Thêm/sửa/xóa danh mục. Ảnh danh mục hỗ trợ cả URL và đường dẫn local
+
+#### 👥 Quản lý Tài khoản
+- Xem danh sách user, thêm tài khoản mới, phân quyền admin/user
+- Kiểm tra email trùng khi thêm mới
+
+#### 📋 Quản lý Đơn hàng
+- Xem danh sách đơn hàng, nhấn **"Cập nhật"** để đổi trạng thái
+- **Khi chuyển sang "Đã giao":** Hệ thống tự động cộng thêm lượt bán vào từng cuốn sách trong đơn
+- Thứ tự trạng thái: `Chờ xác nhận` → `Đã xác nhận` → `Đang giao` → `Đã giao` / `Đã hủy`
+
+---
+
+### 9.3 Nguồn ảnh sách gợi ý
+
+Khi thêm sách mới, bạn có thể lấy link ảnh từ:
+| Nguồn | Cách lấy |
+|-------|---------|
+| **Tiki** | Vào trang sách → chuột phải vào ảnh → Copy image address |
+| **Shopee** | Tương tự Tiki |
+| **Fahasa** | `fahasa.com` → trang sách → copy link ảnh |
+| **Google Images** | Tìm tên sách → chọn ảnh bìa → "View image" → copy URL |
+| **Ảnh local** | Đặt file vào `public/images/Model_image/` → nhập `images/Model_image/ten-anh.jpg` |
+
+---
+
+## 10. LƯU Ý KỸ THUẬT
+
+| Vấn đề | Giải thích |
+|--------|-----------|
+| **Mật khẩu** | Lưu dạng plain text trong `db.json` — chỉ phù hợp môi trường demo/học tập |
+| **ID sách** | json-server tự sinh ID ngẫu nhiên cho bản ghi mới, giao diện dùng STT để hiển thị |
+| **Đa danh mục** | Trường `categoryId` hỗ trợ cả kiểu số đơn và mảng số |
+| **Ảnh** | Hỗ trợ URL tuyệt đối (`http://...`) và đường dẫn tương đối (`images/...`) |
+| **Phiên làm việc** | Dữ liệu lưu trong `db.json` — mọi thay đổi qua Admin Panel được lưu vĩnh viễn |

@@ -47,10 +47,10 @@ export default function Footer() {
           <div className="footer-col">
             <h4 className="footer-title">Liên hệ</h4>
             <div className="footer-contact">
-              <FiMapPin /> <span>Đại Cồ Việt, Hai Bà Trưng, Hà Nội</span>
+              <FiMapPin /> <span>Thăng Long University, Hoàng Mai, Hà Nội</span>
             </div>
             <div className="footer-contact">
-              <FiPhone /> <span>0901 234 567</span>
+              <FiPhone /> <span>0326666666</span>
             </div>
             <div className="footer-contact">
               <FiMail /> <span>contact@bookverse.vn</span>

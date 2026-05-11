@@ -20,8 +20,8 @@ export default function Home() {
           getCategories()
         ])
         const books = booksRes.data
-        setFeaturedBooks(books.filter(b => b.featured).slice(0, 4))
-        setBestsellerBooks(books.filter(b => b.bestseller).slice(0, 4))
+        setFeaturedBooks(books.filter(b => b.featured).sort((a, b) => (b.reviews || 0) - (a.reviews || 0)).slice(0, 4))
+        setBestsellerBooks(books.filter(b => b.bestseller).sort((a, b) => (b.reviews || 0) - (a.reviews || 0)).slice(0, 4))
         setCategories(catsRes.data)
       } catch (err) {
         console.error(err)

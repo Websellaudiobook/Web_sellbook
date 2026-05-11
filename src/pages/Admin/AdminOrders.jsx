@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FiShoppingBag, FiEdit2 } from 'react-icons/fi'
-import { getOrders, updateOrder } from '../../services/api'
+import { getOrders, updateOrder, getBook, updateBook } from '../../services/api'
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/helpers'
 import { toast } from 'react-toastify'
 import { ORDER_STATUSES } from '../../utils/constants'
@@ -20,6 +20,18 @@ export default function AdminOrders() {
 
   const handleStatusUpdate = async () => {
     try {
+      if (newStatus === 'delivered' && editOrder.status !== 'delivered') {
+        for (const item of editOrder.items) {
+          try {
+            const bookRes = await getBook(item.bookId || item.id)
+            if (bookRes && bookRes.data) {
+              const bookData = bookRes.data
+              await updateBook(bookData.id, { ...bookData, sold: (bookData.sold || 0) + item.quantity })
+            }
+          } catch(err) { console.error('Failed to update book sold count:', err) }
+        }
+      }
+      
       await updateOrder(editOrder.id, { ...editOrder, status: newStatus })
       toast.success('Cập nhật trạng thái thành công!')
       setEditOrder(null)
@@ -39,7 +51,7 @@ export default function AdminOrders() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>STT</th>
               <th>Sản phẩm</th>
               <th>Tổng tiền</th>
               <th>Thanh toán</th>
@@ -49,9 +61,9 @@ export default function AdminOrders() {
             </tr>
           </thead>
           <tbody>
-            {orders.map(order => (
+            {orders.map((order, index) => (
               <tr key={order.id}>
-                <td>#{order.id}</td>
+                <td>{index + 1}</td>
                 <td>
                   <div style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {order.items.map(i => `${i.title} (x${i.quantity})`).join(', ')}
@@ -86,7 +98,7 @@ export default function AdminOrders() {
       {editOrder && (
         <div className="admin-form-modal" onClick={(e) => e.target === e.currentTarget && setEditOrder(null)}>
           <div className="admin-form-card">
-            <h2>Chi tiết đơn hàng #{editOrder.id}</h2>
+            <h2>Chi tiết đơn hàng</h2>
             <div style={{ marginBottom: 24, maxHeight: '60vh', overflowY: 'auto', paddingRight: 8 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
                 <div>

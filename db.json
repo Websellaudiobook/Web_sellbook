@@ -21,6 +21,17 @@
       "address": "TP. Hồ Chí Minh, Việt Nam",
       "avatar": "",
       "createdAt": "2026-01-15T00:00:00Z"
+    },
+    {
+      "name": "Đình Vinh",
+      "email": "vinh209@gmail.com",
+      "password": "VINH123",
+      "phone": "",
+      "address": "",
+      "role": "user",
+      "avatar": "",
+      "createdAt": "2026-05-11T12:20:28.397Z",
+      "id": "MjGaZ4kBAl4"
     }
   ],
   "categories": [
@@ -49,16 +60,16 @@
       "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400"
     },
     {
-      "id": "5",
       "name": "Tâm lý",
       "description": "Phát triển bản thân, tâm lý học",
-      "image": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400"
+      "image": "https://khcb.hvpnvn.edu.vn/wp-content/uploads/sites/54/2024/03/skills.png",
+      "id": "5"
     },
     {
-      "id": "6",
       "name": "Thiếu nhi",
       "description": "Truyện tranh, sách giáo dục",
-      "image": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400"
+      "image": "https://img.magnific.com/vector-cao-cap/vector-mien-phi-nen-ky-niem-ngay-quoc-te-thieu-nhi-phang_705652-591.jpg?semt=ais_hybrid&w=740&q=80",
+      "id": "6"
     }
   ],
   "books": [
@@ -69,8 +80,10 @@
       "description": "Đắc nhân tâm là cuốn sách nổi tiếng nhất, bán chạy nhất và có tầm ảnh hưởng nhất của mọi thời đại. Tác phẩm đã được chuyển ngữ sang hầu hết các thứ tiếng trên thế giới và có mặt ở hàng trăm quốc gia. Đây là cuốn sách duy nhất về thể loại self-help liên tục đứng đầu danh mục sách bán chạy nhất do báo The New York Times bình chọn suốt 10 năm liền.",
       "price": 86000,
       "originalPrice": 108000,
-      "image": "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
-      "categoryId": 3,
+      "image": "https://i.ebayimg.com/images/g/ISMAAOSwUB5m7F0T/s-l1600.webp",
+      "categoryId": [
+        3
+      ],
       "stock": 150,
       "rating": 4.8,
       "reviews": 2450,
@@ -81,7 +94,8 @@
       "isbn": "978-604-77-7777-7",
       "featured": true,
       "bestseller": true,
-      "createdAt": "2026-01-01T00:00:00Z"
+      "createdAt": "2026-01-01T00:00:00Z",
+      "sold": 1
     },
     {
       "id": "2",
@@ -90,8 +104,10 @@
       "description": "Tất cả những trải nghiệm trong chuyến phiêu du theo đuổi vận mệnh của mình đã giúp Santiago thấu hiểu được ý nghĩa sâu xa nhất của hạnh phúc, hòa hợp với vũ trụ và con người.",
       "price": 69000,
       "originalPrice": 79000,
-      "image": "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400",
-      "categoryId": 1,
+      "image": "https://salt.tikicdn.com/cache/750x750/ts/product/45/3b/fc/aa81d0a534b45706ae1eee1e344e80d9.jpg.webp",
+      "categoryId": [
+        1
+      ],
       "stock": 200,
       "rating": 4.7,
       "reviews": 1890,
@@ -111,8 +127,10 @@
       "description": "Sapiens là một cuốn sách về lịch sử loài người, bắt đầu từ những ngày đầu tiên của loài Homo sapiens cho đến hiện tại, với sự kết hợp giữa sinh học, nhân chủng học, cổ sinh vật học và kinh tế học.",
       "price": 199000,
       "originalPrice": 249000,
-      "image": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400",
-      "categoryId": 3,
+      "image": "https://static.oreka.vn/800-800_8bdada62-25ef-4e78-9a5c-06933135c335.webp",
+      "categoryId": [
+        3
+      ],
       "stock": 80,
       "rating": 4.9,
       "reviews": 3200,
@@ -132,8 +150,10 @@
       "description": "Cuốn sách kinh điển về tâm lý học hành vi, giải thích hai hệ thống tư duy của con người và cách chúng ảnh hưởng đến quyết định hàng ngày.",
       "price": 189000,
       "originalPrice": 239000,
-      "image": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400",
-      "categoryId": 5,
+      "image": "https://static.oreka.vn/800-800_6754d9d9-3a0a-46e8-9493-43c71e0c9486",
+      "categoryId": [
+        5
+      ],
       "stock": 60,
       "rating": 4.6,
       "reviews": 980,
@@ -153,8 +173,10 @@
       "description": "Cuốn sách gối đầu giường cho mọi lập trình viên. Clean Code hướng dẫn bạn cách viết code sạch, dễ đọc, dễ bảo trì và chuyên nghiệp.",
       "price": 350000,
       "originalPrice": 450000,
-      "image": "https://images.unsplash.com/photo-1515879218367-8466d910auj8?w=400",
-      "categoryId": 4,
+      "image": "https://i.ebayimg.com/images/g/dg4AAeSwYs9pspP2/s-l1600.webp",
+      "categoryId": [
+        4
+      ],
       "stock": 45,
       "rating": 4.9,
       "reviews": 1560,
@@ -174,8 +196,10 @@
       "description": "Tập thơ đình đám nhất của Nguyễn Phong Việt, chạm đến trái tim hàng triệu bạn đọc trẻ Việt Nam với những vần thơ giản dị mà sâu lắng.",
       "price": 75000,
       "originalPrice": 95000,
-      "image": "https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=400",
-      "categoryId": 1,
+      "image": "https://salt.tikicdn.com/cache/750x750/media/catalog/producttmp/11/9d/ef/43df6831778b5581c6e164485a0bab17.jpg.webp",
+      "categoryId": [
+        1
+      ],
       "stock": 120,
       "rating": 4.3,
       "reviews": 670,
@@ -195,8 +219,10 @@
       "description": "Cuốn sách kinh điển về quản lý tài chính cá nhân thông qua những câu chuyện thú vị từ thành Babylon cổ đại.",
       "price": 68000,
       "originalPrice": 85000,
-      "image": "https://images.unsplash.com/photo-1553729784-e91953dec042?w=400",
-      "categoryId": 2,
+      "image": "https://static.oreka.vn/800-800_e0542b1e-b0a2-4e45-a112-2b897e2f0aee.webp",
+      "categoryId": [
+        2
+      ],
       "stock": 90,
       "rating": 4.5,
       "reviews": 1230,
@@ -216,8 +242,10 @@
       "description": "Bộ truyện tranh kinh điển Doraemon kể về chú mèo máy đến từ tương lai với những bảo bối kỳ diệu giúp đỡ cậu bé Nobita.",
       "price": 25000,
       "originalPrice": 25000,
-      "image": "https://images.unsplash.com/photo-1588497859490-85d1c17db96d?w=400",
-      "categoryId": 6,
+      "image": "https://s1.dmcdn.net/u/F1GyE1f-Vyl5XUeXc/240x240",
+      "categoryId": [
+        6
+      ],
       "stock": 500,
       "rating": 4.8,
       "reviews": 5600,
@@ -237,8 +265,10 @@
       "description": "Cuốn sách phổ biến khoa học nổi tiếng nhất thế giới, đưa người đọc khám phá những bí ẩn về vũ trụ, hố đen và thời gian.",
       "price": 120000,
       "originalPrice": 150000,
-      "image": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400",
-      "categoryId": 3,
+      "image": "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m8l7vswl9ls2c6@resize_w900_nl.webp",
+      "categoryId": [
+        3
+      ],
       "stock": 70,
       "rating": 4.7,
       "reviews": 2100,
@@ -258,8 +288,10 @@
       "description": "Cuốn sách về phát triển tư duy làm giàu đã truyền cảm hứng cho hàng triệu người trên thế giới trong suốt hơn 80 năm.",
       "price": 95000,
       "originalPrice": 120000,
-      "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400",
-      "categoryId": 2,
+      "image": "https://static.oreka.vn/800-800_2dbeca04-728a-4fb6-b9c0-ea9640f66790",
+      "categoryId": [
+        2
+      ],
       "stock": 110,
       "rating": 4.4,
       "reviews": 1870,
@@ -300,8 +332,10 @@
       "description": "Cuốn sách best-seller dành cho giới trẻ Việt Nam, giúp bạn tìm ra đam mê và xây dựng con đường sự nghiệp.",
       "price": 72000,
       "originalPrice": 90000,
-      "image": "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400",
-      "categoryId": 5,
+      "image": "https://static.oreka.vn/800-800_c7178b40-240d-44a3-a71b-afe6a6b75893.webp",
+      "categoryId": [
+        5
+      ],
       "stock": 180,
       "rating": 4.2,
       "reviews": 2340,
@@ -313,6 +347,30 @@
       "featured": false,
       "bestseller": true,
       "createdAt": "2026-03-15T00:00:00Z"
+    },
+    {
+      "title": "Dế mèn phiêu lưu ký",
+      "author": "Tô hoài ",
+      "description": "Dế Mèn phiêu lưu ký là tác phẩm văn xuôi đặc sắc và nổi tiếng nhất của nhà văn Tô Hoài viết về thế giới loài vật dành cho lứa tuổi thiếu nhi. Tác phẩm ban đầu có tên là Con dế mèn phát hành năm 1941. Sau đó, tác giả viết thêm phần sau và gộp lại thành truyện dài 10 chương kinh điển như ngày nay",
+      "price": 50000,
+      "originalPrice": 79000,
+      "image": "https://down-vn.img.susercontent.com/file/vn-11134201-7r98o-lm4t6prwoman74@resize_w900_nl.webp",
+      "categoryId": [
+        1,
+        6
+      ],
+      "stock": 231,
+      "rating": 4.5,
+      "reviews": 3618,
+      "publisher": "Kim Đồng",
+      "publishYear": 1941,
+      "pages": 150,
+      "language": "Tiếng Việt",
+      "isbn": "978-604-2-18959-0",
+      "featured": true,
+      "bestseller": true,
+      "createdAt": "2026-05-11T16:05:50.303Z",
+      "id": "20fRllNjhp8"
     }
   ],
   "orders": [
@@ -503,6 +561,44 @@
       "note": "",
       "createdAt": "2026-05-11T04:28:29.097Z",
       "id": "cbxGLz0aoA8"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 1
+        }
+      ],
+      "total": 116000,
+      "status": "delivered",
+      "shippingAddress": "Hà Ndfshdhội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "banking",
+      "note": "dfshdth",
+      "createdAt": "2026-05-11T12:17:02.151Z",
+      "id": "7q5GCn6EbkQ"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 80000,
+      "status": "delivered",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-11T16:37:01.242Z",
+      "id": "feuew5tdI74"
     }
   ],
   "cart": [],

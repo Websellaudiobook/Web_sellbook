@@ -160,7 +160,7 @@ export default function Checkout() {
               <div className="checkout-items">
                 {cartItems.map(item => (
                   <div key={item.id} className="checkout-item">
-                    <img src={item.image} alt={item.title} />
+                    <img src={item.image?.startsWith('http') ? item.image : `/${item.image}`} alt={item.title} />
                     <div className="checkout-item-info">
                       <p className="checkout-item-title">{item.title}</p>
                       <p className="checkout-item-qty">x{item.quantity}</p>

@@ -82,7 +82,7 @@ export default function AdminUsers() {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>STT</th>
               <th>Tên</th>
               <th>Email</th>
               <th>SĐT</th>
@@ -92,9 +92,9 @@ export default function AdminUsers() {
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
+            {users.map((user, index) => (
               <tr key={user.id}>
-                <td>{user.id}</td>
+                <td>{index + 1}</td>
                 <td style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user.phone || '—'}</td>
