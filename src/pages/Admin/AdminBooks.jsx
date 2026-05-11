@@ -3,6 +3,7 @@ import { FiPlus, FiEdit2, FiTrash2, FiBook } from 'react-icons/fi'
 import { getBooks, createBook, updateBook, deleteBook, getCategories } from '../../services/api'
 import { formatPrice } from '../../utils/helpers'
 import { toast } from 'react-toastify'
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog'
 import './Admin.css'
 
 const emptyBook = {
@@ -60,7 +61,7 @@ export default function AdminBooks() {
       setForm(emptyBook)
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -77,7 +78,7 @@ export default function AdminBooks() {
       setConfirmDelete(null)
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -218,16 +219,12 @@ export default function AdminBooks() {
 
       {/* Confirm Delete */}
       {confirmDelete && (
-        <div className="admin-form-modal" onClick={(e) => e.target === e.currentTarget && setConfirmDelete(null)}>
-          <div className="admin-form-card confirm-dialog">
-            <h2>⚠️ Xác nhận xóa</h2>
-            <p>Bạn có chắc chắn muốn xóa sách này?<br />Hành động này không thể hoàn tác.</p>
-            <div className="admin-form-actions" style={{ justifyContent: 'center' }}>
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Hủy</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete)}>Xóa</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="⚠️ Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa sách này? Hành động này không thể hoàn tác."
+          onConfirm={() => handleDelete(confirmDelete)}
+          onCancel={() => setConfirmDelete(null)}
+        />
       )}
     </div>
   )

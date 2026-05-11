@@ -5,7 +5,11 @@ import { getBook, getBooks } from '../../services/api'
 import { useCart } from '../../contexts/CartContext'
 import { formatPrice, getDiscount } from '../../utils/helpers'
 import BookCard from '../../components/BookCard/BookCard'
+import { SkeletonDetail } from '../../components/Skeleton/Skeleton'
+import { toast } from 'react-toastify'
 import './BookDetail.css'
+
+const IMG_FALLBACK = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" fill="%231e1e2e"><rect width="300" height="400"/><text x="150" y="200" text-anchor="middle" fill="%23666" font-size="20">No Image</text></svg>'
 
 export default function BookDetail() {
   const { id } = useParams()
@@ -15,17 +19,19 @@ export default function BookDetail() {
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('description')
+  const [wishlisted, setWishlisted] = useState(false)
 
   useEffect(() => {
     const fetchBook = async () => {
       setLoading(true)
+      setQuantity(1)
       try {
         const res = await getBook(id)
         setBook(res.data)
-        // Fetch related books
-        const allBooks = await getBooks()
+        // Optimized: fetch only books in same category instead of ALL books
+        const allBooks = await getBooks({ categoryId: res.data.categoryId })
         const related = allBooks.data
-          .filter(b => b.categoryId === res.data.categoryId && b.id !== res.data.id)
+          .filter(b => b.id !== res.data.id)
           .slice(0, 4)
         setRelatedBooks(related)
       } catch (err) {
@@ -35,11 +41,10 @@ export default function BookDetail() {
       }
     }
     fetchBook()
-    window.scrollTo(0, 0)
   }, [id])
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner"></div></div>
+    return <SkeletonDetail />
   }
 
   if (!book) {
@@ -47,12 +52,35 @@ export default function BookDetail() {
       <div className="empty-state" style={{ paddingTop: '120px' }}>
         <div className="empty-state-icon">📚</div>
         <h3 className="empty-state-title">Không tìm thấy sách</h3>
+        <p className="empty-state-text">Sách này không tồn tại hoặc đã bị xóa</p>
         <Link to="/books" className="btn btn-primary">Quay lại</Link>
       </div>
     )
   }
 
   const discount = getDiscount(book.price, book.originalPrice)
+
+  const handleWishlist = () => {
+    setWishlisted(!wishlisted)
+    if (!wishlisted) {
+      toast.success('Đã thêm vào yêu thích! ❤️')
+    } else {
+      toast.info('Đã bỏ yêu thích')
+    }
+  }
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: book.title,
+        text: `Xem "${book.title}" trên BookVerse`,
+        url: window.location.href
+      })
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      toast.success('Đã sao chép link! 🔗')
+    }
+  }
 
   return (
     <div className="book-detail page-enter">
@@ -65,7 +93,11 @@ export default function BookDetail() {
           {/* Image */}
           <div className="detail-image-wrapper">
             <div className="detail-image">
-              <img src={book.image} alt={book.title} />
+              <img
+                src={book.image}
+                alt={book.title}
+                onError={(e) => { e.target.src = IMG_FALLBACK }}
+              />
               {discount > 0 && <span className="detail-discount">-{discount}%</span>}
             </div>
           </div>
@@ -132,8 +164,15 @@ export default function BookDetail() {
             </div>
 
             <div className="detail-share">
-              <button className="btn btn-secondary btn-sm"><FiHeart /> Yêu thích</button>
-              <button className="btn btn-secondary btn-sm"><FiShare2 /> Chia sẻ</button>
+              <button
+                className={`btn btn-sm ${wishlisted ? 'btn-wishlist-active' : 'btn-secondary'}`}
+                onClick={handleWishlist}
+              >
+                <FiHeart /> {wishlisted ? 'Đã yêu thích' : 'Yêu thích'}
+              </button>
+              <button className="btn btn-secondary btn-sm" onClick={handleShare}>
+                <FiShare2 /> Chia sẻ
+              </button>
             </div>
           </div>
         </div>
@@ -181,7 +220,7 @@ export default function BookDetail() {
         {relatedBooks.length > 0 && (
           <div className="related-section">
             <h2 className="section-title">Sách liên quan</h2>
-            <div className="books-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+            <div className="related-grid">
               {relatedBooks.map(b => <BookCard key={b.id} book={b} />)}
             </div>
           </div>

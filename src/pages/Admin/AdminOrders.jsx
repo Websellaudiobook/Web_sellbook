@@ -3,9 +3,8 @@ import { FiShoppingBag, FiEdit2 } from 'react-icons/fi'
 import { getOrders, updateOrder } from '../../services/api'
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/helpers'
 import { toast } from 'react-toastify'
+import { ORDER_STATUSES } from '../../utils/constants'
 import './Admin.css'
-
-const statuses = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled']
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([])
@@ -26,7 +25,7 @@ export default function AdminOrders() {
       setEditOrder(null)
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -106,7 +105,7 @@ export default function AdminOrders() {
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
               >
-                {statuses.map(s => (
+                {ORDER_STATUSES.map(s => (
                   <option key={s} value={s}>{getStatusLabel(s)}</option>
                 ))}
               </select>

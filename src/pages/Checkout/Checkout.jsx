@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { FiMapPin, FiPhone, FiCreditCard, FiTruck, FiCheck } from 'react-icons/fi'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { createOrder } from '../../services/api'
 import { formatPrice } from '../../utils/helpers'
+import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD, PAYMENT_METHODS } from '../../utils/constants'
 import { toast } from 'react-toastify'
 import './Checkout.css'
 
@@ -20,7 +21,7 @@ export default function Checkout() {
     note: ''
   })
 
-  const shipping = cartTotal >= 300000 ? 0 : 30000
+  const shipping = cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE
   const total = cartTotal + shipping
 
   const handleChange = (e) => {
@@ -63,9 +64,9 @@ export default function Checkout() {
     }
   }
 
+  // Fix: Use Navigate component instead of calling navigate() during render
   if (cartItems.length === 0) {
-    navigate('/cart')
-    return null
+    return <Navigate to="/cart" replace />
   }
 
   return (
@@ -131,11 +132,7 @@ export default function Checkout() {
             <div className="checkout-section card">
               <h3><FiCreditCard /> Phương thức thanh toán</h3>
               <div className="payment-options">
-                {[
-                  { value: 'cod', label: 'Thanh toán khi nhận hàng (COD)', icon: '💵' },
-                  { value: 'banking', label: 'Chuyển khoản ngân hàng', icon: '🏦' },
-                  { value: 'momo', label: 'Ví MoMo', icon: '📱' }
-                ].map(opt => (
+                {PAYMENT_METHODS.map(opt => (
                   <label
                     key={opt.value}
                     className={`payment-option ${form.paymentMethod === opt.value ? 'active' : ''}`}

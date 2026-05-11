@@ -3,6 +3,7 @@ import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowRight, FiShoppingCart 
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice } from '../../utils/helpers'
+import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD } from '../../utils/constants'
 import './Cart.css'
 
 export default function Cart() {
@@ -68,17 +69,17 @@ export default function Cart() {
               </div>
               <div className="summary-row">
                 <span>Phí vận chuyển</span>
-                <span>{cartTotal >= 300000 ? 'Miễn phí' : formatPrice(30000)}</span>
+                <span>{cartTotal >= FREE_SHIPPING_THRESHOLD ? 'Miễn phí' : formatPrice(SHIPPING_FEE)}</span>
               </div>
-              {cartTotal < 300000 && (
+              {cartTotal < FREE_SHIPPING_THRESHOLD && (
                 <div className="summary-note">
-                  Mua thêm {formatPrice(300000 - cartTotal)} để được miễn phí ship
+                  Mua thêm {formatPrice(FREE_SHIPPING_THRESHOLD - cartTotal)} để được miễn phí ship
                 </div>
               )}
               <div className="summary-divider"></div>
               <div className="summary-row summary-total">
                 <span>Tổng cộng</span>
-                <span>{formatPrice(cartTotal + (cartTotal >= 300000 ? 0 : 30000))}</span>
+                <span>{formatPrice(cartTotal + (cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE))}</span>
               </div>
               {user ? (
                 <Link to="/checkout" className="btn btn-primary btn-lg summary-btn">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { FiPlus, FiEdit2, FiTrash2, FiGrid } from 'react-icons/fi'
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../../services/api'
 import { toast } from 'react-toastify'
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog'
 import './Admin.css'
 
 export default function AdminCategories() {
@@ -33,7 +34,7 @@ export default function AdminCategories() {
       setForm({ name: '', description: '', image: '' })
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -50,7 +51,7 @@ export default function AdminCategories() {
       setConfirmDelete(null)
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -120,16 +121,12 @@ export default function AdminCategories() {
       )}
 
       {confirmDelete && (
-        <div className="admin-form-modal" onClick={(e) => e.target === e.currentTarget && setConfirmDelete(null)}>
-          <div className="admin-form-card confirm-dialog">
-            <h2>⚠️ Xác nhận xóa</h2>
-            <p>Bạn có chắc chắn muốn xóa danh mục này?</p>
-            <div className="admin-form-actions" style={{ justifyContent: 'center' }}>
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Hủy</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete)}>Xóa</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="⚠️ Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa danh mục này?"
+          onConfirm={() => handleDelete(confirmDelete)}
+          onCancel={() => setConfirmDelete(null)}
+        />
       )}
     </div>
   )

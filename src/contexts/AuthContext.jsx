@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { loginUser, registerUser, getUsers } from '../services/api'
 import { toast } from 'react-toastify'
+import { STORAGE_KEYS } from '../utils/constants'
 
 const AuthContext = createContext()
 
@@ -11,12 +12,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('bookstore_user')
+    const savedUser = localStorage.getItem(STORAGE_KEYS.USER)
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser))
       } catch {
-        localStorage.removeItem('bookstore_user')
+        localStorage.removeItem(STORAGE_KEYS.USER)
       }
     }
     setLoading(false)
@@ -24,19 +25,21 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const res = await loginUser(email, password)
-      if (res.data.length > 0) {
-        const userData = res.data[0]
-        setUser(userData)
-        localStorage.setItem('bookstore_user', JSON.stringify(userData))
-        toast.success(`Chào mừng ${userData.name}!`)
-        return { success: true, user: userData }
+      // Security: Fetch user by email only, compare password client-side
+      // This prevents password from appearing in URL query params
+      const res = await loginUser(email)
+      const foundUser = res.data.find(u => u.password === password)
+      if (foundUser) {
+        setUser(foundUser)
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(foundUser))
+        toast.success(`Chào mừng ${foundUser.name}!`)
+        return { success: true, user: foundUser }
       } else {
         toast.error('Email hoặc mật khẩu không đúng!')
         return { success: false }
       }
     } catch (error) {
-      toast.error('Đã xảy ra lỗi, vui lòng thử lại!')
+      toast.error(error.friendlyMessage || 'Đã xảy ra lỗi, vui lòng thử lại!')
       return { success: false }
     }
   }
@@ -59,18 +62,18 @@ export function AuthProvider({ children }) {
       }
       const res = await registerUser(newUser)
       setUser(res.data)
-      localStorage.setItem('bookstore_user', JSON.stringify(res.data))
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(res.data))
       toast.success('Đăng ký thành công!')
       return { success: true }
     } catch (error) {
-      toast.error('Đã xảy ra lỗi, vui lòng thử lại!')
+      toast.error(error.friendlyMessage || 'Đã xảy ra lỗi, vui lòng thử lại!')
       return { success: false }
     }
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem('bookstore_user')
+    localStorage.removeItem(STORAGE_KEYS.USER)
     toast.info('Đã đăng xuất!')
   }
 

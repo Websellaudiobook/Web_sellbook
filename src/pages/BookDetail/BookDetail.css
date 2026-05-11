@@ -238,6 +238,19 @@
   margin-top: 60px;
 }
 
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* Wishlist Active */
+.btn-wishlist-active {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
+}
+
 @media (max-width: 768px) {
   .detail-grid {
     grid-template-columns: 1fr;
@@ -264,7 +277,11 @@
     width: 100%;
   }
 
-  .related-section .books-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-meta {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FiMail, FiLock, FiUser, FiPhone, FiMapPin, FiBookOpen, FiEye, FiEyeOff } from 'react-icons/fi'
+import { FiMail, FiLock, FiUser, FiPhone, FiMapPin, FiBookOpen, FiEye, FiEyeOff, FiCheck } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
+import { toast } from 'react-toastify'
 import './Auth.css'
 
 export default function Register() {
@@ -21,9 +22,41 @@ export default function Register() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  // Password strength checker
+  const getPasswordStrength = (pass) => {
+    if (!pass) return { level: 0, text: '', color: '' }
+    let score = 0
+    if (pass.length >= 6) score++
+    if (pass.length >= 8) score++
+    if (/[A-Z]/.test(pass)) score++
+    if (/[0-9]/.test(pass)) score++
+    if (/[^A-Za-z0-9]/.test(pass)) score++
+    if (score <= 1) return { level: 1, text: 'Yếu', color: 'var(--error)' }
+    if (score <= 3) return { level: 2, text: 'Trung bình', color: '#f59e0b' }
+    return { level: 3, text: 'Mạnh', color: 'var(--success)' }
+  }
+
+  const passwordStrength = getPasswordStrength(form.password)
+
+  const validatePhone = (phone) => {
+    if (!phone) return true // optional field
+    return /^0\d{9}$/.test(phone)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!form.name || !form.email || !form.password) return
+    if (!form.name || !form.email || !form.password) {
+      toast.error('Vui lòng điền đầy đủ thông tin bắt buộc!')
+      return
+    }
+    if (form.password.length < 6) {
+      toast.error('Mật khẩu phải có ít nhất 6 ký tự!')
+      return
+    }
+    if (form.phone && !validatePhone(form.phone)) {
+      toast.error('Số điện thoại phải có 10 chữ số và bắt đầu bằng 0!')
+      return
+    }
     setLoading(true)
     const result = await register(form)
     setLoading(false)
@@ -97,6 +130,14 @@ export default function Register() {
                 {showPass ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
+            {form.password && (
+              <div className="password-strength">
+                <div className="strength-bar">
+                  <div className="strength-fill" style={{ width: `${(passwordStrength.level / 3) * 100}%`, background: passwordStrength.color }}></div>
+                </div>
+                <span style={{ color: passwordStrength.color, fontSize: '0.75rem' }}>{passwordStrength.text}</span>
+              </div>
+            )}
           </div>
 
           <div className="form-group">

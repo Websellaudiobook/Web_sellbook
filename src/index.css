@@ -665,3 +665,61 @@ ul, ol {
   font-weight: 700;
   margin-left: 8px;
 }
+
+/* ===== PAGINATION DISABLED ===== */
+.pagination button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===== ERROR BOUNDARY ===== */
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: 24px;
+}
+
+.error-boundary-content {
+  text-align: center;
+  max-width: 480px;
+}
+
+.error-boundary-icon {
+  font-size: 4rem;
+  color: var(--error);
+  margin-bottom: 24px;
+}
+
+.error-boundary-content h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.error-boundary-content p {
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ===== SECTION HEADER ===== */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+

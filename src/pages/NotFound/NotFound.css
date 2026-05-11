@@ -1,0 +1,90 @@
+.notfound-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.notfound-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.notfound-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+
+.notfound-orb-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--primary);
+  top: -100px;
+  right: -100px;
+  animation: float 6s ease-in-out infinite;
+}
+
+.notfound-orb-2 {
+  width: 350px;
+  height: 350px;
+  background: var(--accent);
+  bottom: -80px;
+  left: -80px;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+.notfound-content {
+  position: relative;
+  text-align: center;
+  padding: 40px;
+  z-index: 1;
+}
+
+.notfound-code {
+  font-size: 8rem;
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 16px;
+  letter-spacing: -4px;
+}
+
+.notfound-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.notfound-desc {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 420px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+}
+
+.notfound-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .notfound-code {
+    font-size: 5rem;
+  }
+  .notfound-title {
+    font-size: 1.3rem;
+  }
+  .notfound-desc {
+    font-size: 0.95rem;
+  }
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiPackage, FiClock, FiEye } from 'react-icons/fi'
-import { getOrdersByUser } from '../../services/api'
+import { getOrders } from '../../services/api'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/helpers'
 import './Orders.css'
@@ -14,8 +14,10 @@ export default function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await getOrdersByUser(user.id)
-        setOrders(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+        // Fix: Fetch all orders and filter client-side to avoid JSON server string/number ID mismatch
+        const res = await getOrders()
+        const myOrders = res.data.filter(o => String(o.userId) === String(user.id))
+        setOrders(myOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
       } catch (err) {
         console.error(err)
       } finally {

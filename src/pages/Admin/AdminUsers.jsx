@@ -3,6 +3,7 @@ import { FiPlus, FiEdit2, FiTrash2, FiUsers } from 'react-icons/fi'
 import { getUsers, createUser, updateUser, deleteUser } from '../../services/api'
 import { formatDate } from '../../utils/helpers'
 import { toast } from 'react-toastify'
+import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog'
 import './Admin.css'
 
 const emptyUser = { name: '', email: '', password: '', phone: '', address: '', role: 'user' }
@@ -47,7 +48,7 @@ export default function AdminUsers() {
       setForm(emptyUser)
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -64,7 +65,7 @@ export default function AdminUsers() {
       setConfirmDelete(null)
       fetchData()
     } catch (err) {
-      toast.error('Có lỗi xảy ra!')
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra!')
     }
   }
 
@@ -161,16 +162,12 @@ export default function AdminUsers() {
       )}
 
       {confirmDelete && (
-        <div className="admin-form-modal" onClick={(e) => e.target === e.currentTarget && setConfirmDelete(null)}>
-          <div className="admin-form-card confirm-dialog">
-            <h2>⚠️ Xác nhận xóa</h2>
-            <p>Bạn có chắc chắn muốn xóa tài khoản này?</p>
-            <div className="admin-form-actions" style={{ justifyContent: 'center' }}>
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Hủy</button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete)}>Xóa</button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title="⚠️ Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa tài khoản này?"
+          onConfirm={() => handleDelete(confirmDelete)}
+          onCancel={() => setConfirmDelete(null)}
+        />
       )}
     </div>
   )

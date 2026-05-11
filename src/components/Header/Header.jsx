@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiUser, FiLogOut, FiMenu, FiX, FiSearch, FiSettings, FiBookOpen, FiHome, FiGrid, FiClock } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
@@ -12,6 +12,20 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false)
+      }
+    }
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [userMenuOpen])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -60,7 +74,7 @@ export default function Header() {
                 {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
               </Link>
 
-              <div className="user-menu-wrapper">
+              <div className="user-menu-wrapper" ref={userMenuRef}>
                 <button
                   className="user-btn"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -72,16 +86,16 @@ export default function Header() {
                 </button>
 
                 {userMenuOpen && (
-                  <div className="user-dropdown" onClick={() => setUserMenuOpen(false)}>
-                    <Link to="/orders" className="dropdown-item">
+                  <div className="user-dropdown">
+                    <Link to="/orders" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
                       <FiClock /> Lịch sử mua hàng
                     </Link>
                     {isAdmin && (
-                      <Link to="/admin" className="dropdown-item">
+                      <Link to="/admin" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
                         <FiSettings /> Quản trị
                       </Link>
                     )}
-                    <button onClick={logout} className="dropdown-item dropdown-logout">
+                    <button onClick={() => { logout(); setUserMenuOpen(false) }} className="dropdown-item dropdown-logout">
                       <FiLogOut /> Đăng xuất
                     </button>
                   </div>

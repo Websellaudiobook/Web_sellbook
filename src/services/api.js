@@ -6,8 +6,27 @@ const api = axios.create({
   baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 10000
 })
+
+// ===== RESPONSE INTERCEPTOR (Error handling) =====
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      // Network error
+      error.friendlyMessage = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng!'
+    } else if (error.response.status === 404) {
+      error.friendlyMessage = 'Dữ liệu không tồn tại!'
+    } else if (error.response.status === 500) {
+      error.friendlyMessage = 'Lỗi server nội bộ. Vui lòng thử lại sau!'
+    } else {
+      error.friendlyMessage = 'Đã xảy ra lỗi, vui lòng thử lại!'
+    }
+    return Promise.reject(error)
+  }
+)
 
 // ===== BOOKS =====
 export const getBooks = (params = {}) => api.get('/books', { params })
@@ -29,8 +48,10 @@ export const getUser = (id) => api.get(`/users/${id}`)
 export const createUser = (data) => api.post('/users', data)
 export const updateUser = (id, data) => api.put(`/users/${id}`, data)
 export const deleteUser = (id) => api.delete(`/users/${id}`)
-export const loginUser = (email, password) =>
-  api.get('/users', { params: { email, password } })
+// Security: Login uses POST-like approach by fetching by email only,
+// then comparing password on the client side (avoids password in URL params)
+export const loginUser = (email) =>
+  api.get('/users', { params: { email } })
 export const registerUser = (data) => api.post('/users', data)
 
 // ===== ORDERS =====

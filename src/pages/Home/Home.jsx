@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FiArrowRight, FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiStar } from 'react-icons/fi'
 import { getBooks, getCategories } from '../../services/api'
 import BookCard from '../../components/BookCard/BookCard'
+import { toast } from 'react-toastify'
 import './Home.css'
 
 export default function Home() {
@@ -203,7 +204,16 @@ export default function Home() {
             <div className="newsletter-content">
               <h2>📬 Đăng ký nhận tin</h2>
               <p>Nhận thông báo sách mới và ưu đãi đặc biệt</p>
-              <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
+              <form className="newsletter-form" onSubmit={(e) => {
+                e.preventDefault()
+                const email = e.target.querySelector('input').value
+                if (email) {
+                  toast.success('Đăng ký nhận tin thành công! 📬')
+                  e.target.querySelector('input').value = ''
+                } else {
+                  toast.error('Vui lòng nhập email!')
+                }
+              }}>
                 <input type="email" placeholder="Email của bạn..." className="form-input" />
                 <button type="submit" className="btn btn-primary">Đăng ký</button>
               </form>

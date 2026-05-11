@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
+import { STORAGE_KEYS } from '../utils/constants'
 
 const CartContext = createContext()
 
@@ -9,34 +10,33 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([])
 
   useEffect(() => {
-    const saved = localStorage.getItem('bookstore_cart')
+    const saved = localStorage.getItem(STORAGE_KEYS.CART)
     if (saved) {
       try {
         setCartItems(JSON.parse(saved))
       } catch {
-        localStorage.removeItem('bookstore_cart')
+        localStorage.removeItem(STORAGE_KEYS.CART)
       }
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('bookstore_cart', JSON.stringify(cartItems))
+    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cartItems))
   }, [cartItems])
 
   const addToCart = (book, quantity = 1) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === book.id)
       if (existing) {
-        toast.success(`Đã cập nhật số lượng "${book.title}" trong giỏ hàng`)
         return prev.map(item =>
           item.id === book.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
       }
-      toast.success(`Đã thêm "${book.title}" vào giỏ hàng`)
       return [...prev, { ...book, quantity }]
     })
+    toast.success(`Đã thêm "${book.title}" vào giỏ hàng`)
   }
 
   const removeFromCart = (bookId) => {

@@ -21,17 +21,6 @@
       "address": "TP. Hồ Chí Minh, Việt Nam",
       "avatar": "",
       "createdAt": "2026-01-15T00:00:00Z"
-    },
-    {
-      "name": "nguyễn gia baot",
-      "email": "baonguyengia847@gmail.com",
-      "password": "123456",
-      "phone": "0962831518",
-      "address": "hà nội",
-      "role": "user",
-      "avatar": "",
-      "createdAt": "2026-05-04T14:44:30.183Z",
-      "id": "tZ00BZmG2Bo"
     }
   ],
   "categories": [
@@ -372,7 +361,7 @@
       "createdAt": "2026-04-15T14:00:00Z"
     },
     {
-      "userId": "tZ00BZmG2Bo",
+      "userId": null,
       "items": [
         {
           "bookId": "12",
@@ -389,6 +378,131 @@
       "note": "",
       "createdAt": "2026-05-04T14:45:30.213Z",
       "id": "qPZTo1mlkko"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 3
+        },
+        {
+          "bookId": "10",
+          "title": "Nghĩ Giàu Làm Giàu",
+          "price": 95000,
+          "quantity": 1
+        },
+        {
+          "bookId": "7",
+          "title": "Người Giàu Có Nhất Thành Babylon",
+          "price": 68000,
+          "quantity": 1
+        }
+      ],
+      "total": 421000,
+      "status": "pending",
+      "shippingAddress": "Ninh Kiều, Chương Mỹ Bẩn, Hà Nội",
+      "phone": "0989808080",
+      "paymentMethod": "cod",
+      "note": "Giao cho thằng chú bảo ngo",
+      "createdAt": "2026-05-11T04:03:32.307Z",
+      "id": "C0dqh5y7wws"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "11",
+          "title": "JavaScript: The Good Parts",
+          "price": 280000,
+          "quantity": 1
+        }
+      ],
+      "total": 310000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-11T04:04:37.818Z",
+      "id": "hKKq4GKIUsQ"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 2
+        },
+        {
+          "bookId": "3",
+          "title": "Sapiens: Lược Sử Loài Người",
+          "price": 199000,
+          "quantity": 1
+        }
+      ],
+      "total": 371000,
+      "status": "pending",
+      "shippingAddress": "Ninh Kiều, Chương Mỹ Bẩn, Hà Nội",
+      "phone": "0901234567",
+      "paymentMethod": "banking",
+      "note": "Giao cho chó bủ",
+      "createdAt": "2026-05-11T04:06:43.962Z",
+      "id": "qx1x0QzbwRk"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "12",
+          "title": "Tuổi Trẻ Đáng Giá Bao Nhiêu",
+          "price": 72000,
+          "quantity": 1
+        }
+      ],
+      "total": 102000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam123 ABC Street",
+      "phone": "09012345670901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-11T04:14:44.741Z",
+      "id": "aM-XNWZXOUk"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "11",
+          "title": "JavaScript: The Good Parts",
+          "price": 280000,
+          "quantity": 1
+        },
+        {
+          "bookId": "10",
+          "title": "Nghĩ Giàu Làm Giàu",
+          "price": 95000,
+          "quantity": 1
+        },
+        {
+          "bookId": "12",
+          "title": "Tuổi Trẻ Đáng Giá Bao Nhiêu",
+          "price": 72000,
+          "quantity": 1
+        }
+      ],
+      "total": 447000,
+      "status": "delivered",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-11T04:28:29.097Z",
+      "id": "cbxGLz0aoA8"
     }
   ],
   "cart": [],
