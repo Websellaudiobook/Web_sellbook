@@ -52,8 +52,10 @@ export default function AdminOrders() {
             {orders.map(order => (
               <tr key={order.id}>
                 <td>#{order.id}</td>
-                <td style={{ maxWidth: 250 }}>
-                  {order.items.map(i => `${i.title} (x${i.quantity})`).join(', ')}
+                <td>
+                  <div style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {order.items.map(i => `${i.title} (x${i.quantity})`).join(', ')}
+                  </div>
                 </td>
                 <td style={{ fontWeight: 600, color: 'var(--error)' }}>{formatPrice(order.total)}</td>
                 <td>
@@ -84,19 +86,41 @@ export default function AdminOrders() {
       {editOrder && (
         <div className="admin-form-modal" onClick={(e) => e.target === e.currentTarget && setEditOrder(null)}>
           <div className="admin-form-card">
-            <h2>Cập nhật đơn hàng #{editOrder.id}</h2>
-            <div style={{ marginBottom: 20 }}>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>
-                <strong>Địa chỉ:</strong> {editOrder.shippingAddress}
-              </p>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>
-                <strong>SĐT:</strong> {editOrder.phone}
-              </p>
-              {editOrder.note && (
-                <p style={{ color: 'var(--text-secondary)' }}>
-                  <strong>Ghi chú:</strong> {editOrder.note}
-                </p>
-              )}
+            <h2>Chi tiết đơn hàng #{editOrder.id}</h2>
+            <div style={{ marginBottom: 24, maxHeight: '60vh', overflowY: 'auto', paddingRight: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                <div>
+                  <h4 style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: '0.85rem', textTransform: 'uppercase' }}>Thông tin khách hàng</h4>
+                  <p style={{ color: 'var(--text-secondary)', marginBottom: 4 }}><strong>SĐT:</strong> {editOrder.phone}</p>
+                  <p style={{ color: 'var(--text-secondary)', marginBottom: 4 }}><strong>Địa chỉ:</strong> {editOrder.shippingAddress}</p>
+                  {editOrder.note && <p style={{ color: 'var(--text-secondary)' }}><strong>Ghi chú:</strong> {editOrder.note}</p>}
+                </div>
+                <div>
+                  <h4 style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: '0.85rem', textTransform: 'uppercase' }}>Thông tin thanh toán</h4>
+                  <p style={{ color: 'var(--text-secondary)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <strong>Hình thức:</strong>
+                    <span className="badge badge-info">{editOrder.paymentMethod === 'cod' ? 'COD' : editOrder.paymentMethod === 'banking' ? 'Banking' : 'MoMo'}</span>
+                  </p>
+                  <p style={{ color: 'var(--text-secondary)', marginBottom: 4 }}><strong>Ngày đặt:</strong> {formatDate(editOrder.createdAt)}</p>
+                </div>
+              </div>
+              
+              <h4 style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: '0.85rem', textTransform: 'uppercase' }}>Sản phẩm đã mua</h4>
+              <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: 16 }}>
+                {editOrder.items.map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: idx !== editOrder.items.length - 1 ? '1px solid var(--border-color)' : 'none' }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.title}</span>
+                      <span style={{ color: 'var(--text-muted)' }}>x{item.quantity}</span>
+                    </div>
+                    <span style={{ color: 'var(--text-primary)' }}>{formatPrice(item.price * item.quantity)}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, paddingTop: 16, borderTop: '1px dashed var(--border-color)', fontWeight: 700, fontSize: '1.1rem' }}>
+                  <span>Tổng cộng:</span>
+                  <span style={{ color: 'var(--error)' }}>{formatPrice(editOrder.total)}</span>
+                </div>
+              </div>
             </div>
             <div className="form-group">
               <label className="form-label">Trạng thái đơn hàng</label>

@@ -112,7 +112,11 @@ export default function AdminBooks() {
               <tr key={book.id}>
                 <td>{book.id}</td>
                 <td><img src={book.image} alt="" style={{ width: 40, height: 52, objectFit: 'cover', borderRadius: 4 }} /></td>
-                <td style={{ fontWeight: 500, color: 'var(--text-primary)', maxWidth: 200 }}>{book.title}</td>
+                <td>
+                  <div style={{ fontWeight: 500, color: 'var(--text-primary)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {book.title}
+                  </div>
+                </td>
                 <td>{book.author}</td>
                 <td><span className="badge badge-primary">{getCategoryName(book.categoryId)}</span></td>
                 <td style={{ fontWeight: 600, color: 'var(--error)' }}>{formatPrice(book.price)}</td>
