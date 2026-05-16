@@ -14,6 +14,7 @@ export default function Checkout() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [form, setForm] = useState({
     address: user?.address || '',
     phone: user?.phone || '',
@@ -33,6 +34,12 @@ export default function Checkout() {
     if (!form.address || !form.phone) {
       toast.error('Vui lòng điền đầy đủ thông tin giao hàng!')
       return
+    }
+
+    const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
+    if (!phoneRegex.test(form.phone.trim())) {
+      toast.error('Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.');
+      return;
     }
 
     setLoading(true)
@@ -55,8 +62,7 @@ export default function Checkout() {
       }
       await createOrder(order)
       clearCart()
-      toast.success('Đặt hàng thành công! 🎉')
-      navigate('/orders')
+      setIsSuccess(true)
     } catch (err) {
       toast.error('Đặt hàng thất bại, vui lòng thử lại!')
     } finally {
@@ -65,8 +71,26 @@ export default function Checkout() {
   }
 
   // Fix: Use Navigate component instead of calling navigate() during render
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && !isSuccess) {
     return <Navigate to="/cart" replace />
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="checkout-page page-enter">
+        <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            <img src="/favicon.svg" alt="BookVerse Logo" style={{ width: '100px', height: '100px' }} />
+          </div>
+          <h2 style={{ marginBottom: '15px' }}>Đặt hàng thành công! 🎉</h2>
+          <p style={{ color: 'var(--text-light)', marginBottom: '30px', fontSize: '16px' }}>Cảm ơn bạn đã mua sắm tại BookVerse. Đơn hàng của bạn đang được xử lý.</p>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+            <button className="btn btn-primary" onClick={() => navigate('/orders')}>Xem đơn hàng của bạn</button>
+            <button className="btn btn-secondary" onClick={() => navigate('/books')}>Tiếp tục mua sắm</button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

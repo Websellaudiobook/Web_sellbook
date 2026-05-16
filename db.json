@@ -210,7 +210,8 @@
       "isbn": "978-604-77-2222-2",
       "featured": false,
       "bestseller": false,
-      "createdAt": "2026-02-05T00:00:00Z"
+      "createdAt": "2026-02-05T00:00:00Z",
+      "sold": 2
     },
     {
       "id": "7",
@@ -302,7 +303,8 @@
       "isbn": "978-604-77-6666-6",
       "featured": false,
       "bestseller": true,
-      "createdAt": "2026-03-05T00:00:00Z"
+      "createdAt": "2026-03-05T00:00:00Z",
+      "sold": 4
     },
     {
       "id": "11",
@@ -370,7 +372,8 @@
       "featured": true,
       "bestseller": true,
       "createdAt": "2026-05-11T16:05:50.303Z",
-      "id": "20fRllNjhp8"
+      "id": "20fRllNjhp8",
+      "sold": 2
     }
   ],
   "orders": [
@@ -599,6 +602,176 @@
       "note": "",
       "createdAt": "2026-05-11T16:37:01.242Z",
       "id": "feuew5tdI74"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 33
+        },
+        {
+          "bookId": "3",
+          "title": "Sapiens: Lược Sử Loài Người",
+          "price": 199000,
+          "quantity": 1
+        }
+      ],
+      "total": 1849000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-11T17:09:02.738Z",
+      "id": "0j1fIxMILQU"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 2
+        },
+        {
+          "bookId": "6",
+          "title": "Dấu Chân Trên Cát",
+          "price": 75000,
+          "quantity": 2
+        },
+        {
+          "bookId": "10",
+          "title": "Nghĩ Giàu Làm Giàu",
+          "price": 95000,
+          "quantity": 4
+        }
+      ],
+      "total": 630000,
+      "status": "delivered",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "banking",
+      "note": "",
+      "createdAt": "2026-05-11T17:19:52.359Z",
+      "id": "6oLdJo1iOJc"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "12",
+          "title": "Tuổi Trẻ Đáng Giá Bao Nhiêu",
+          "price": 72000,
+          "quantity": 2
+        }
+      ],
+      "total": 174000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "banking",
+      "note": "",
+      "createdAt": "2026-05-16T14:59:00.403Z",
+      "id": "cezz-GVuutg"
+    },
+    {
+      "userId": "2",
+      "items": [
+        {
+          "bookId": "11",
+          "title": "JavaScript: The Good Parts",
+          "price": 280000,
+          "quantity": 1
+        }
+      ],
+      "total": 310000,
+      "status": "pending",
+      "shippingAddress": "123 Main St",
+      "phone": "abc",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-16T15:15:46.271Z",
+      "id": "4w4PGWgMky4"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 80000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "agfgag",
+      "paymentMethod": "cod",
+      "note": "vdfg",
+      "createdAt": "2026-05-16T15:21:21.832Z",
+      "id": "hvuymiqYAmw"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "8",
+          "title": "Doraemon - Tập 1",
+          "price": 25000,
+          "quantity": 2
+        }
+      ],
+      "total": 80000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "banking",
+      "note": "",
+      "createdAt": "2026-05-16T15:28:24.046Z",
+      "id": "iyGenqYkm-E"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 80000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-16T15:29:14.708Z",
+      "id": "tl3rjfzBGyg"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 80000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-16T15:35:03.016Z",
+      "id": "80TW6cAKqzk"
     }
   ],
   "cart": [],

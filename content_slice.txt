@@ -1,0 +1,100 @@
+Slide 1: Tiêu đề dự án
+Đề tài: Phát triển hệ thống Web Thương mại điện tử chuyên biệt cho Sách.
+
+Sinh viên thực hiện: Đỗ Đình Vinh.
+
+Công nghệ cốt lõi: [Ví dụ: React, Node.js, SQL Server].
+
+Mục tiêu: Xây dựng hệ thống bán hàng hoàn chỉnh, bảo mật và hiệu năng cao.
+
+Slide 2: Phân tích thị trường & Bài toán thực tế
+Vấn đề: Các web bán sách hiện nay cần tính cá nhân hóa cao và tốc độ truy xuất dữ liệu lớn.
+
+Giải pháp: Hệ thống tập trung vào trải nghiệm người dùng, tìm kiếm thông minh và quản trị kho hàng chặt chẽ.
+
+Slide 3: Đối tượng sử dụng & Luồng người dùng (User Flow)
+Khách vãng lai: Xem, tìm kiếm, lọc sách.
+
+Khách hàng: Quản lý profile, giỏ hàng, lịch sử đơn hàng, đánh giá.
+
+Admin: Điều hành toàn bộ dòng tiền, hàng hóa và tài khoản.
+
+Slide 4: Kiến trúc hệ thống (Architecture)
+Mô hình: Client-Server.
+
+Frontend: Single Page Application (SPA).
+
+Backend: RESTful API Design.
+
+Giao tiếp: JSON qua giao thức HTTP/HTTPS.
+
+Slide 5: Stack công nghệ chi tiết
+Frontend: [React/Vue/HTML5] + Tailwind CSS (UI đồng nhất).
+
+Backend: [Node.js/Python/Java] + JWT (Xác thực).
+
+Database: [SQL/NoSQL] + Sequelize/Mongoose (ORM).
+
+DevOps/Tools: Git, Postman, Docker (nếu có).
+
+Slide 6: Sơ đồ chức năng (Use Case Diagram)
+Hình ảnh sơ đồ mô tả mối quan hệ giữa các Actor (User, Admin) và các chức năng (Đặt hàng, Quản lý kho, Thanh toán).
+
+Slide 7: Thiết kế Cơ sở dữ liệu (ERD)
+Chi tiết các thực thể: Users, Books, Categories, Orders, OrderDetails, Reviews.
+
+Mô tả mối quan hệ: 1-n (Category - Book), n-n (Order - Book qua OrderDetail).
+
+Slide 8: Thiết kế API (RESTful Services)
+Liệt kê các Endpoint chính:
+
+GET /api/books: Lấy danh sách sách (phân trang).
+
+POST /api/cart: Thêm sản phẩm vào giỏ.
+
+POST /api/auth/login: Xác thực người dùng.
+
+PUT /api/admin/orders: Cập nhật trạng thái đơn hàng.
+
+Slide 9: Giao diện Trang chủ & UX Tìm kiếm
+Tích hợp Thanh tìm kiếm (Search bar) với thuật toán lọc theo thời gian thực.
+
+Hiển thị sách theo danh mục và sách bán chạy (Top Sellers).
+
+Slide 10: Giao diện Chi tiết & Quản lý giỏ hàng
+Tính năng: Xem ảnh zoom, mô tả chi tiết, sách liên quan.
+
+Logic giỏ hàng: Xử lý State (Redux/Context API hoặc LocalStorage) để đảm bảo không mất dữ liệu khi F5.
+
+Slide 11: Quy trình Đặt hàng & Thanh toán
+Luồng dữ liệu: Kiểm tra tồn kho -> Xác nhận thông tin -> Tạo đơn hàng -> Gửi mail thông báo.
+
+Giả định: Tích hợp thanh toán COD và chuyển khoản ngân hàng.
+
+Slide 12: Trang Quản trị (Admin Panel)
+Biểu đồ thống kê: Doanh thu theo tháng, biểu đồ hình quạt cho thể loại sách bán chạy.
+
+CRUD sản phẩm: Upload ảnh bằng Cloudinary hoặc lưu trữ local.
+
+Slide 13: Bảo mật & Tối ưu hệ thống
+Bảo mật: Băm mật khẩu (Bcrypt), ngăn chặn SQL Injection, phân quyền Middleware.
+
+Tối ưu: Lazy loading cho hình ảnh, Caching dữ liệu đơn giản để tăng tốc độ phản hồi.
+
+Slide 14: Kiểm thử (Testing) & Kết quả
+Kiểm thử chức năng (Unit Test): Kiểm tra logic tính tiền giỏ hàng.
+
+Kiểm thử giao diện: Responsive trên Mobile, Tablet và Desktop.
+
+Kết quả: Hệ thống chạy ổn định, không lỗi logic nghiệp vụ.
+
+Slide 15: Kết luận & Hướng phát triển
+Đã làm được: Hoàn thiện Web bán sách Full-stack theo đúng yêu cầu.
+
+Hướng phát triển:
+
+Triển khai Recommendation System (AI gợi ý sách).
+
+Tích hợp thanh toán điện tử (MoMo/ZaloPay).
+
+Triển khai lên Hosting (Heroku/Vercel).

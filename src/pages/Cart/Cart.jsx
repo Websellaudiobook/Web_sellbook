@@ -1,14 +1,31 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowRight, FiShoppingCart } from 'react-icons/fi'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice } from '../../utils/helpers'
 import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD } from '../../utils/constants'
+import { toast } from 'react-toastify'
 import './Cart.css'
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart()
   const { user } = useAuth()
+  const [discountCode, setDiscountCode] = useState('')
+  const [discountApplied, setDiscountApplied] = useState(false)
+
+  const handleApplyDiscount = () => {
+    if (!discountCode.trim()) return;
+    if (discountCode.trim().toUpperCase() === 'BOOKVERSE10') {
+      setDiscountApplied(true);
+      toast.success('Áp dụng mã giảm giá thành công!');
+    } else {
+      toast.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
+      setDiscountApplied(false);
+    }
+  }
+
+  const finalTotal = discountApplied ? cartTotal * 0.9 : cartTotal;
 
   if (cartItems.length === 0) {
     return (
@@ -80,10 +97,38 @@ export default function Cart() {
                   Mua thêm {formatPrice(FREE_SHIPPING_THRESHOLD - cartTotal)} để được miễn phí ship
                 </div>
               )}
+              
+              <div className="summary-discount" style={{ marginTop: '15px', marginBottom: '15px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Mã giảm giá (VD: BOOKVERSE10)" 
+                    className="form-input" 
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value)}
+                    disabled={discountApplied}
+                    style={{ flex: 1 }}
+                  />
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={handleApplyDiscount}
+                    disabled={discountApplied}
+                    style={{ padding: '0 15px' }}
+                  >
+                    Áp dụng
+                  </button>
+                </div>
+                {discountApplied && (
+                  <p style={{ color: 'var(--success-color)', fontSize: '14px', marginTop: '8px' }}>
+                    Đã giảm 10% trên tổng giá trị sách
+                  </p>
+                )}
+              </div>
+
               <div className="summary-divider"></div>
               <div className="summary-row summary-total">
                 <span>Tổng cộng</span>
-                <span>{formatPrice(cartTotal + (cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE))}</span>
+                <span>{formatPrice(finalTotal + (cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE))}</span>
               </div>
               {user ? (
                 <Link to="/checkout" className="btn btn-primary btn-lg summary-btn">
