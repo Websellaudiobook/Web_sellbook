@@ -1,11 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiStar, FiEye } from 'react-icons/fi'
 import { useCart } from '../../contexts/CartContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice, getDiscount } from '../../utils/helpers'
+import { toast } from 'react-toastify'
 import './BookCard.css'
 
 export default function BookCard({ book }) {
+  const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { user } = useAuth()
   const discount = getDiscount(book.price, book.originalPrice)
 
   return (
@@ -27,7 +31,17 @@ export default function BookCard({ book }) {
           <Link to={`/books/${book.id}`} className="overlay-btn">
             <FiEye /> Xem chi tiết
           </Link>
-          <button onClick={() => addToCart(book)} className="overlay-btn overlay-btn-cart">
+          <button
+            onClick={() => {
+              if (!user) {
+                toast.info('Vui lòng đăng nhập để thêm vào giỏ hàng')
+                navigate('/login')
+                return
+              }
+              addToCart(book)
+            }}
+            className="overlay-btn overlay-btn-cart"
+          >
             <FiShoppingCart /> Thêm vào giỏ
           </button>
         </div>

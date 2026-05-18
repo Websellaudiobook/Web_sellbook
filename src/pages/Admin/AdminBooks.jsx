@@ -13,6 +13,13 @@ const emptyBook = {
   isbn: '', featured: false, bestseller: false
 }
 
+const normalizeCategoryIds = (value) => {
+  const arr = Array.isArray(value) ? value : (value ? [value] : [])
+  return arr
+    .map(id => String(id))
+    .filter(id => id && id !== 'NaN' && id !== 'undefined' && id !== 'null')
+}
+
 export default function AdminBooks() {
   const [books, setBooks] = useState([])
   const [categories, setCategories] = useState([])
@@ -40,7 +47,7 @@ export default function AdminBooks() {
       ...form,
       price: Number(form.price),
       originalPrice: Number(form.originalPrice),
-      categoryId: Array.isArray(form.categoryId) ? form.categoryId.map(Number) : [Number(form.categoryId)],
+      categoryId: normalizeCategoryIds(form.categoryId),
       stock: Number(form.stock),
       pages: Number(form.pages),
       publishYear: Number(form.publishYear),
@@ -68,7 +75,10 @@ export default function AdminBooks() {
   }
 
   const handleEdit = (book) => {
-    setForm(book)
+    setForm({
+      ...book,
+      categoryId: normalizeCategoryIds(book.categoryId)
+    })
     setEditId(book.id)
     setShowForm(true)
   }
@@ -86,9 +96,12 @@ export default function AdminBooks() {
 
   const getCategoryName = (catData) => {
     if (Array.isArray(catData)) {
-      return catData.map(id => categories.find(c => c.id == id)?.name).filter(Boolean).join(', ')
+      return catData
+        .map(id => categories.find(c => String(c.id) === String(id))?.name)
+        .filter(Boolean)
+        .join(', ')
     }
-    return categories.find(c => c.id == catData)?.name || '—'
+    return categories.find(c => String(c.id) === String(catData))?.name || '—'
   }
 
   return (
@@ -162,15 +175,15 @@ export default function AdminBooks() {
                       <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
-                          checked={Array.isArray(form.categoryId) ? form.categoryId.includes(Number(c.id)) : form.categoryId == c.id}
+                          checked={normalizeCategoryIds(form.categoryId).includes(String(c.id))}
                           onChange={(e) => {
-                            let current = Array.isArray(form.categoryId) ? [...form.categoryId] : (form.categoryId ? [Number(form.categoryId)] : []);
+                            let current = normalizeCategoryIds(form.categoryId)
                             if (e.target.checked) {
-                              if (!current.includes(Number(c.id))) current.push(Number(c.id));
+                              if (!current.includes(String(c.id))) current.push(String(c.id))
                             } else {
-                              current = current.filter(id => id != c.id);
+                              current = current.filter(id => id !== String(c.id))
                             }
-                            setForm({ ...form, categoryId: current });
+                            setForm({ ...form, categoryId: current })
                           }}
                         /> {c.name}
                       </label>

@@ -32,6 +32,17 @@
       "avatar": "",
       "createdAt": "2026-05-11T12:20:28.397Z",
       "id": "MjGaZ4kBAl4"
+    },
+    {
+      "name": "ạdksad",
+      "email": "hianhem@gmail.com",
+      "password": "khacdai24",
+      "phone": "0982980324",
+      "address": "kajdasd",
+      "role": "user",
+      "avatar": "",
+      "createdAt": "2026-05-18T14:46:05.321Z",
+      "id": "dR8dCyN9oeE"
     }
   ],
   "categories": [
@@ -70,6 +81,12 @@
       "description": "Truyện tranh, sách giáo dục",
       "image": "https://img.magnific.com/vector-cao-cap/vector-mien-phi-nen-ky-niem-ngay-quoc-te-thieu-nhi-phang_705652-591.jpg?semt=ais_hybrid&w=740&q=80",
       "id": "6"
+    },
+    {
+      "name": "Khác ABC",
+      "description": "",
+      "image": "",
+      "id": "6R6uQHz2qWU"
     }
   ],
   "books": [
@@ -82,7 +99,10 @@
       "originalPrice": 108000,
       "image": "https://i.ebayimg.com/images/g/ISMAAOSwUB5m7F0T/s-l1600.webp",
       "categoryId": [
-        3
+        3,
+        4,
+        6,
+        null
       ],
       "stock": 150,
       "rating": 4.8,
@@ -95,7 +115,7 @@
       "featured": true,
       "bestseller": true,
       "createdAt": "2026-01-01T00:00:00Z",
-      "sold": 1
+      "sold": 3
     },
     {
       "id": "2",
@@ -106,7 +126,10 @@
       "originalPrice": 79000,
       "image": "https://salt.tikicdn.com/cache/750x750/ts/product/45/3b/fc/aa81d0a534b45706ae1eee1e344e80d9.jpg.webp",
       "categoryId": [
-        1
+        "1",
+        "0",
+        "6",
+        "6R6uQHz2qWU"
       ],
       "stock": 200,
       "rating": 4.7,
@@ -129,7 +152,8 @@
       "originalPrice": 249000,
       "image": "https://static.oreka.vn/800-800_8bdada62-25ef-4e78-9a5c-06933135c335.webp",
       "categoryId": [
-        3
+        3,
+        null
       ],
       "stock": 80,
       "rating": 4.9,
@@ -152,7 +176,8 @@
       "originalPrice": 239000,
       "image": "https://static.oreka.vn/800-800_6754d9d9-3a0a-46e8-9493-43c71e0c9486",
       "categoryId": [
-        5
+        "5",
+        "6R6uQHz2qWU"
       ],
       "stock": 60,
       "rating": 4.6,
@@ -280,7 +305,8 @@
       "isbn": "978-604-77-5555-5",
       "featured": true,
       "bestseller": false,
-      "createdAt": "2026-03-01T00:00:00Z"
+      "createdAt": "2026-03-01T00:00:00Z",
+      "sold": 3
     },
     {
       "id": "10",
@@ -772,6 +798,74 @@
       "note": "",
       "createdAt": "2026-05-16T15:35:03.016Z",
       "id": "80TW6cAKqzk"
+    },
+    {
+      "userId": "2",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 2
+        },
+        {
+          "bookId": "9",
+          "title": "Lược Sử Thời Gian",
+          "price": 120000,
+          "quantity": 3
+        }
+      ],
+      "total": 532000,
+      "status": "delivered",
+      "shippingAddress": "TP. Hồ Chí Minh, Việt Nam",
+      "phone": "0909876543",
+      "paymentMethod": "cod",
+      "note": "ÁLKJDSAD",
+      "createdAt": "2026-05-18T14:41:00.579Z",
+      "id": "g_i5exm9qaE"
+    },
+    {
+      "userId": "2",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 80000,
+      "status": "pending",
+      "shippingAddress": "TP. Hồ Chí Minh, Việt Nam",
+      "phone": "0909876543",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-18T14:41:12.948Z",
+      "id": "kCoOi--7IPg"
+    }
+  ],
+  "discounts": [
+    {
+      "id": "1",
+      "code": "BOOKVERSE10",
+      "percent": 10,
+      "active": true,
+      "expiresAt": null,
+      "createdAt": "2026-05-18T00:00:00Z"
+    },
+    {
+      "code": "ADD",
+      "percent": 10,
+      "active": true,
+      "expiresAt": "2011-12-23",
+      "id": "hcI94wtNRtw"
+    }
+  ],
+  "subscribers": [
+    {
+      "email": "khacdai24moon@gmail.com",
+      "createdAt": "2026-05-18T15:31:28.866Z",
+      "id": "G7ZAeyw1mkk"
     }
   ],
   "cart": [],

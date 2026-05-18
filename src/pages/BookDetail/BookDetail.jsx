@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiHeart, FiShare2, FiStar, FiMinus, FiPlus, FiArrowLeft, FiBook, FiCalendar, FiGlobe, FiHash } from 'react-icons/fi'
 import { getBook, getBooks } from '../../services/api'
 import { useCart } from '../../contexts/CartContext'
+import { useWishlist } from '../../contexts/WishlistContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice, getDiscount } from '../../utils/helpers'
 import BookCard from '../../components/BookCard/BookCard'
 import { SkeletonDetail } from '../../components/Skeleton/Skeleton'
@@ -13,13 +15,16 @@ const IMG_FALLBACK = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"
 
 export default function BookDetail() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { user } = useAuth()
+  const { toggleWishlist, isWishlisted } = useWishlist()
   const [book, setBook] = useState(null)
   const [relatedBooks, setRelatedBooks] = useState([])
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('description')
-  const [wishlisted, setWishlisted] = useState(false)
+  const wishlisted = book ? isWishlisted(book.id) : false
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -29,13 +34,17 @@ export default function BookDetail() {
         const res = await getBook(id)
         setBook(res.data)
         // Fetch all books then filter client-side vì json-server không query được trong mảng categoryId
-        const catId = Array.isArray(res.data.categoryId) ? res.data.categoryId[0] : res.data.categoryId
+        const categoryIds = Array.isArray(res.data.categoryId) ? res.data.categoryId : [res.data.categoryId]
+        const catId = categoryIds
+          .map(id => String(id))
+          .find(id => id && id !== 'NaN' && id !== 'undefined' && id !== 'null')
         const allBooks = await getBooks()
         const related = allBooks.data
           .filter(b => {
             if (b.id === res.data.id) return false
-            if (Array.isArray(b.categoryId)) return b.categoryId.includes(Number(catId))
-            return b.categoryId == catId
+            if (!catId) return false
+            if (Array.isArray(b.categoryId)) return b.categoryId.map(id => String(id)).includes(catId)
+            return String(b.categoryId) === catId
           })
           .slice(0, 4)
         setRelatedBooks(related)
@@ -66,12 +75,12 @@ export default function BookDetail() {
   const discount = getDiscount(book.price, book.originalPrice)
 
   const handleWishlist = () => {
-    setWishlisted(!wishlisted)
-    if (!wishlisted) {
-      toast.success('Đã thêm vào yêu thích! ❤️')
-    } else {
-      toast.info('Đã bỏ yêu thích')
+    if (!user) {
+      toast.info('Vui lòng đăng nhập để lưu yêu thích')
+      navigate('/login')
+      return
     }
+    toggleWishlist(book)
   }
 
   const handleShare = () => {
@@ -161,7 +170,14 @@ export default function BookDetail() {
               </div>
               <button
                 className="btn btn-primary btn-lg"
-                onClick={() => addToCart(book, quantity)}
+                onClick={() => {
+                  if (!user) {
+                    toast.info('Vui lòng đăng nhập để thêm vào giỏ hàng')
+                    navigate('/login')
+                    return
+                  }
+                  addToCart(book, quantity)
+                }}
                 disabled={book.stock === 0}
               >
                 <FiShoppingCart /> Thêm vào giỏ hàng

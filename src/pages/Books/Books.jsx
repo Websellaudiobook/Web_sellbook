@@ -15,6 +15,8 @@ export default function Books() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('categoryId') || '')
+  const [featuredOnly, setFeaturedOnly] = useState(searchParams.get('featured') === 'true')
+  const [bestsellerOnly, setBestsellerOnly] = useState(searchParams.get('bestseller') === 'true')
   const [sortBy, setSortBy] = useState('newest')
   const [priceRange, setPriceRange] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
@@ -40,6 +42,8 @@ export default function Books() {
   useEffect(() => {
     setSearch(searchParams.get('search') || '')
     setSelectedCategory(searchParams.get('categoryId') || '')
+    setFeaturedOnly(searchParams.get('featured') === 'true')
+    setBestsellerOnly(searchParams.get('bestseller') === 'true')
     setCurrentPage(1)
   }, [searchParams])
 
@@ -54,12 +58,20 @@ export default function Books() {
       })
       .filter(book => {
         if (selectedCategory) {
-          const catId = parseInt(selectedCategory)
+          const catId = String(selectedCategory)
           if (Array.isArray(book.categoryId)) {
-            return book.categoryId.includes(catId)
+            return book.categoryId.map(id => String(id)).includes(catId)
           }
-          return book.categoryId === catId
+          return String(book.categoryId) === catId
         }
+        return true
+      })
+      .filter(book => {
+        if (featuredOnly) return !!book.featured
+        return true
+      })
+      .filter(book => {
+        if (bestsellerOnly) return !!book.bestseller
         return true
       })
       .filter(book => {
@@ -90,7 +102,13 @@ export default function Books() {
   }, [debouncedSearch, selectedCategory, priceRange, sortBy])
 
   // Active filters count for mobile badge
-  const activeFilters = [selectedCategory, priceRange !== 'all' ? priceRange : '', debouncedSearch].filter(Boolean).length
+  const activeFilters = [
+    selectedCategory,
+    priceRange !== 'all' ? priceRange : '',
+    debouncedSearch,
+    featuredOnly ? 'featured' : '',
+    bestsellerOnly ? 'bestseller' : ''
+  ].filter(Boolean).length
 
   if (loading) {
     return (

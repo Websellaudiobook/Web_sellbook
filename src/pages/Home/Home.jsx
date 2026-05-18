@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiArrowRight, FiTruck, FiShield, FiRefreshCw, FiHeadphones, FiStar } from 'react-icons/fi'
-import { getBooks, getCategories } from '../../services/api'
+import { getBooks, getCategories, getSubscribers, createSubscriber } from '../../services/api'
 import BookCard from '../../components/BookCard/BookCard'
 import { toast } from 'react-toastify'
 import './Home.css'
@@ -61,7 +61,7 @@ export default function Home() {
               Hàng ngàn đầu sách chất lượng với giá ưu đãi. Miễn phí giao hàng cho đơn từ 300.000đ. Đổi trả dễ dàng trong 30 ngày.
             </p>
             <div className="hero-actions">
-              <Link to="/books" className="btn btn-primary btn-lg">
+              <Link to="/books?featured=true" className="btn btn-primary btn-lg">
                 Khám phá ngay <FiArrowRight />
               </Link>
               <Link to="/books?bestseller=true" className="btn btn-secondary btn-lg">
@@ -204,14 +204,26 @@ export default function Home() {
             <div className="newsletter-content">
               <h2>📬 Đăng ký nhận tin</h2>
               <p>Nhận thông báo sách mới và ưu đãi đặc biệt</p>
-              <form className="newsletter-form" onSubmit={(e) => {
+              <form className="newsletter-form" onSubmit={async (e) => {
                 e.preventDefault()
-                const email = e.target.querySelector('input').value
-                if (email) {
-                  toast.success('Đăng ký nhận tin thành công! 📬')
-                  e.target.querySelector('input').value = ''
-                } else {
+                const input = e.target.querySelector('input')
+                const email = input?.value?.trim()
+                if (!email) {
                   toast.error('Vui lòng nhập email!')
+                  return
+                }
+                try {
+                  const res = await getSubscribers()
+                  const exists = res.data.some(s => s.email?.toLowerCase() === email.toLowerCase())
+                  if (exists) {
+                    toast.info('Email này đã đăng ký nhận tin')
+                    return
+                  }
+                  await createSubscriber({ email, createdAt: new Date().toISOString() })
+                  toast.success('Đăng ký nhận tin thành công!')
+                  if (input) input.value = ''
+                } catch (err) {
+                  toast.error(err.friendlyMessage || 'Đăng ký thất bại')
                 }
               }}>
                 <input type="email" placeholder="Email của bạn..." className="form-input" />

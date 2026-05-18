@@ -19,6 +19,8 @@ const Register = lazy(() => import('./pages/Auth/Register'))
 const Cart = lazy(() => import('./pages/Cart/Cart'))
 const Checkout = lazy(() => import('./pages/Checkout/Checkout'))
 const Orders = lazy(() => import('./pages/Orders/Orders'))
+const Wishlist = lazy(() => import('./pages/Wishlist/Wishlist'))
+const Profile = lazy(() => import('./pages/Profile/Profile'))
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'))
 
 // Admin pages
@@ -28,6 +30,8 @@ const AdminBooks = lazy(() => import('./pages/Admin/AdminBooks'))
 const AdminCategories = lazy(() => import('./pages/Admin/AdminCategories'))
 const AdminUsers = lazy(() => import('./pages/Admin/AdminUsers'))
 const AdminOrders = lazy(() => import('./pages/Admin/AdminOrders'))
+const AdminDiscounts = lazy(() => import('./pages/Admin/AdminDiscounts'))
+const AdminSubscribers = lazy(() => import('./pages/Admin/AdminSubscribers'))
 
 function PageLoader() {
   return (
@@ -80,6 +84,16 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<ClientLayout><Cart /></ClientLayout>} />
+          <Route path="/wishlist" element={
+            <ProtectedRoute>
+              <ClientLayout><Wishlist /></ClientLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ClientLayout><Profile /></ClientLayout>
+            </ProtectedRoute>
+          } />
           <Route path="/checkout" element={
             <ProtectedRoute>
               <ClientLayout><Checkout /></ClientLayout>
@@ -102,6 +116,8 @@ export default function App() {
             <Route path="categories" element={<AdminCategories />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="discounts" element={<AdminDiscounts />} />
+            <Route path="subscribers" element={<AdminSubscribers />} />
           </Route>
 
           {/* 404 Not Found */}
