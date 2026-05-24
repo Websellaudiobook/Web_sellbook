@@ -3,9 +3,9 @@ import { useNavigate, Navigate } from 'react-router-dom'
 import { FiMapPin, FiPhone, FiCreditCard, FiTruck, FiCheck } from 'react-icons/fi'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
-import { createOrder } from '../../services/api'
+import { createOrder, getBook, updateBook, getDiscounts } from '../../services/api'
 import { formatPrice } from '../../utils/helpers'
-import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD, PAYMENT_METHODS } from '../../utils/constants'
+import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD, PAYMENT_METHODS, STORAGE_KEYS } from '../../utils/constants'
 import { toast } from 'react-toastify'
 import './Checkout.css'
 
@@ -15,6 +15,14 @@ export default function Checkout() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [discountInfo, setDiscountInfo] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.CHECKOUT_DISCOUNT)) || null
+    } catch {
+      localStorage.removeItem(STORAGE_KEYS.CHECKOUT_DISCOUNT)
+      return null
+    }
+  })
   const [form, setForm] = useState({
     address: user?.address || '',
     phone: user?.phone || '',
@@ -22,11 +30,43 @@ export default function Checkout() {
     note: ''
   })
 
+  const discountPercent = Number(discountInfo?.percent || 0)
+  const discountAmount = Math.round(cartTotal * discountPercent / 100)
+  const subtotalAfterDiscount = Math.max(0, cartTotal - discountAmount)
   const shipping = cartTotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE
-  const total = cartTotal + shipping
+  const total = subtotalAfterDiscount + shipping
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const validateCheckoutDiscount = async () => {
+    if (!discountInfo?.code) return null
+
+    const res = await getDiscounts()
+    const match = res.data.find(d => String(d.code || '').toUpperCase() === String(discountInfo.code).toUpperCase())
+    const isExpired = match?.expiresAt ? new Date(match.expiresAt) < new Date() : false
+    if (!match || match.active === false || isExpired) {
+      localStorage.removeItem(STORAGE_KEYS.CHECKOUT_DISCOUNT)
+      setDiscountInfo(null)
+      toast.error('Mã giảm giá không còn hợp lệ. Vui lòng kiểm tra lại tổng tiền.')
+      return false
+    }
+
+    const normalized = { code: match.code, percent: Number(match.percent) || 0 }
+    setDiscountInfo(normalized)
+    return normalized
+  }
+
+  const rollbackStock = async (updatedBooks) => {
+    await Promise.allSettled(
+      updatedBooks.map(({ book, quantity }) =>
+        updateBook(book.id, {
+          ...book,
+          stock: Number(book.stock || 0) + Number(quantity || 0)
+        })
+      )
+    )
   }
 
   const handleSubmit = async (e) => {
@@ -36,14 +76,55 @@ export default function Checkout() {
       return
     }
 
-    const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
+    const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/
     if (!phoneRegex.test(form.phone.trim())) {
-      toast.error('Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.');
-      return;
+      toast.error('Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.')
+      return
     }
 
     setLoading(true)
+    const updatedBooks = []
     try {
+      const validDiscount = await validateCheckoutDiscount()
+      if (validDiscount === false) return
+
+      const activeDiscountPercent = Number(validDiscount?.percent || discountPercent || 0)
+      const activeDiscountAmount = Math.round(cartTotal * activeDiscountPercent / 100)
+      const activeSubtotalAfterDiscount = Math.max(0, cartTotal - activeDiscountAmount)
+      const activeTotal = activeSubtotalAfterDiscount + shipping
+
+      const latestBooks = await Promise.all(
+        cartItems.map(async item => {
+          const res = await getBook(item.id)
+          return res.data
+        })
+      )
+
+      const stockErrors = cartItems
+        .map(item => {
+          const latestBook = latestBooks.find(book => String(book.id) === String(item.id))
+          const currentStock = Number(latestBook?.stock || 0)
+          if (currentStock < item.quantity) {
+            return `"${item.title}" chỉ còn ${currentStock} sản phẩm`
+          }
+          return null
+        })
+        .filter(Boolean)
+
+      if (stockErrors.length > 0) {
+        toast.error(stockErrors.join(', '))
+        return
+      }
+
+      for (const item of cartItems) {
+        const latestBook = latestBooks.find(book => String(book.id) === String(item.id))
+        await updateBook(latestBook.id, {
+          ...latestBook,
+          stock: Math.max(0, Number(latestBook.stock || 0) - Number(item.quantity || 0))
+        })
+        updatedBooks.push({ book: latestBook, quantity: item.quantity })
+      }
+
       const order = {
         userId: user.id,
         items: cartItems.map(item => ({
@@ -52,7 +133,12 @@ export default function Checkout() {
           price: item.price,
           quantity: item.quantity
         })),
-        total: total,
+        subtotal: cartTotal,
+        discountCode: validDiscount?.code || null,
+        discountPercent: activeDiscountPercent,
+        discountAmount: activeDiscountAmount,
+        shippingFee: shipping,
+        total: activeTotal,
         status: 'pending',
         shippingAddress: form.address,
         phone: form.phone,
@@ -60,17 +146,23 @@ export default function Checkout() {
         note: form.note,
         createdAt: new Date().toISOString()
       }
-      await createOrder(order)
+
+      try {
+        await createOrder(order)
+      } catch (err) {
+        await rollbackStock(updatedBooks)
+        throw err
+      }
+
       clearCart()
       setIsSuccess(true)
     } catch (err) {
-      toast.error('Đặt hàng thất bại, vui lòng thử lại!')
+      toast.error(err.friendlyMessage || 'Đặt hàng thất bại, vui lòng thử lại!')
     } finally {
       setLoading(false)
     }
   }
 
-  // Fix: Use Navigate component instead of calling navigate() during render
   if (cartItems.length === 0 && !isSuccess) {
     return <Navigate to="/cart" replace />
   }
@@ -82,8 +174,10 @@ export default function Checkout() {
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
             <img src="/favicon.svg" alt="BookVerse Logo" style={{ width: '100px', height: '100px' }} />
           </div>
-          <h2 style={{ marginBottom: '15px' }}>Đặt hàng thành công! 🎉</h2>
-          <p style={{ color: 'var(--text-light)', marginBottom: '30px', fontSize: '16px' }}>Cảm ơn bạn đã mua sắm tại BookVerse. Đơn hàng của bạn đang được xử lý.</p>
+          <h2 style={{ marginBottom: '15px' }}>Đặt hàng thành công!</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '30px', fontSize: '16px' }}>
+            Cảm ơn bạn đã mua sắm tại BookVerse. Đơn hàng của bạn đang được xử lý.
+          </p>
           <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
             <button className="btn btn-primary" onClick={() => navigate('/orders')}>Xem đơn hàng của bạn</button>
             <button className="btn btn-secondary" onClick={() => navigate('/books')}>Tiếp tục mua sắm</button>
@@ -102,7 +196,6 @@ export default function Checkout() {
 
         <form onSubmit={handleSubmit} className="checkout-layout">
           <div className="checkout-form">
-            {/* Shipping Info */}
             <div className="checkout-section card">
               <h3><FiTruck /> Thông tin giao hàng</h3>
 
@@ -152,7 +245,6 @@ export default function Checkout() {
               </div>
             </div>
 
-            {/* Payment */}
             <div className="checkout-section card">
               <h3><FiCreditCard /> Phương thức thanh toán</h3>
               <div className="payment-options">
@@ -177,7 +269,6 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* Order Summary */}
           <div className="checkout-summary">
             <div className="summary-card card">
               <h3 className="summary-title">Đơn hàng của bạn</h3>
@@ -198,6 +289,12 @@ export default function Checkout() {
                 <span>Tạm tính</span>
                 <span>{formatPrice(cartTotal)}</span>
               </div>
+              {discountInfo?.code && (
+                <div className="summary-row">
+                  <span>Mã giảm giá ({discountInfo.code})</span>
+                  <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
               <div className="summary-row">
                 <span>Phí vận chuyển</span>
                 <span>{shipping === 0 ? 'Miễn phí' : formatPrice(shipping)}</span>

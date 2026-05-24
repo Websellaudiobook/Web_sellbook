@@ -8,9 +8,16 @@ import './Admin.css'
 
 const emptyBook = {
   title: '', author: '', description: '', price: '', originalPrice: '',
-  image: '', categoryId: [], stock: '', rating: 4.5, reviews: 0,
+  image: '', categoryId: [], stock: '',
   publisher: '', publishYear: 2026, pages: '', language: 'Tiếng Việt',
   isbn: '', featured: false, bestseller: false
+}
+
+const normalizeCategoryIds = (value) => {
+  const arr = Array.isArray(value) ? value : (value ? [value] : [])
+  return arr
+    .map(id => String(id))
+    .filter(id => id && id !== 'NaN' && id !== 'undefined' && id !== 'null')
 }
 
 export default function AdminBooks() {
@@ -20,6 +27,8 @@ export default function AdminBooks() {
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState(emptyBook)
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const lowStockBooks = books.filter(book => Number(book.stock || 0) > 0 && Number(book.stock || 0) <= 10)
+  const outOfStockBooks = books.filter(book => Number(book.stock || 0) <= 0)
 
   const fetchData = async () => {
     const [booksRes, catsRes] = await Promise.all([getBooks(), getCategories()])
@@ -36,16 +45,15 @@ export default function AdminBooks() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const { rating, reviews, ...formWithoutFakeRating } = form
     const data = {
-      ...form,
+      ...formWithoutFakeRating,
       price: Number(form.price),
       originalPrice: Number(form.originalPrice),
-      categoryId: Array.isArray(form.categoryId) ? form.categoryId.map(Number) : [Number(form.categoryId)],
+      categoryId: normalizeCategoryIds(form.categoryId),
       stock: Number(form.stock),
       pages: Number(form.pages),
       publishYear: Number(form.publishYear),
-      rating: Number(form.rating),
-      reviews: Number(form.reviews),
       createdAt: editId ? form.createdAt : new Date().toISOString()
     }
     try {
@@ -68,7 +76,10 @@ export default function AdminBooks() {
   }
 
   const handleEdit = (book) => {
-    setForm(book)
+    setForm({
+      ...book,
+      categoryId: normalizeCategoryIds(book.categoryId)
+    })
     setEditId(book.id)
     setShowForm(true)
   }
@@ -86,9 +97,12 @@ export default function AdminBooks() {
 
   const getCategoryName = (catData) => {
     if (Array.isArray(catData)) {
-      return catData.map(id => categories.find(c => c.id == id)?.name).filter(Boolean).join(', ')
+      return catData
+        .map(id => categories.find(c => String(c.id) === String(id))?.name)
+        .filter(Boolean)
+        .join(', ')
     }
-    return categories.find(c => c.id == catData)?.name || '—'
+    return categories.find(c => String(c.id) === String(catData))?.name || '—'
   }
 
   return (
@@ -99,6 +113,14 @@ export default function AdminBooks() {
           <FiPlus /> Thêm sách mới
         </button>
       </div>
+
+      {(lowStockBooks.length > 0 || outOfStockBooks.length > 0) && (
+        <div className="admin-stock-alert">
+          <strong>Cảnh báo tồn kho:</strong>
+          {lowStockBooks.length > 0 && <span>{lowStockBooks.length} sách sắp hết hàng</span>}
+          {outOfStockBooks.length > 0 && <span>{outOfStockBooks.length} sách đã hết hàng</span>}
+        </div>
+      )}
 
       <div className="table-container">
         <table className="data-table">
@@ -127,7 +149,11 @@ export default function AdminBooks() {
                 <td>{book.author}</td>
                 <td><span className="badge badge-primary">{getCategoryName(book.categoryId)}</span></td>
                 <td style={{ fontWeight: 600, color: 'var(--error)' }}>{formatPrice(book.price)}</td>
-                <td>{book.stock}</td>
+                <td>
+                  <span className={`badge ${Number(book.stock || 0) <= 0 ? 'badge-danger' : Number(book.stock || 0) <= 10 ? 'badge-warning' : 'badge-success'}`}>
+                    {Number(book.stock || 0) <= 0 ? 'Hết hàng' : `${book.stock} còn`}
+                  </span>
+                </td>
                 <td>
                   <div className="actions">
                     <button className="btn btn-secondary btn-sm" onClick={() => handleEdit(book)}><FiEdit2 /></button>
@@ -162,15 +188,15 @@ export default function AdminBooks() {
                       <label key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
-                          checked={Array.isArray(form.categoryId) ? form.categoryId.includes(Number(c.id)) : form.categoryId == c.id}
+                          checked={normalizeCategoryIds(form.categoryId).includes(String(c.id))}
                           onChange={(e) => {
-                            let current = Array.isArray(form.categoryId) ? [...form.categoryId] : (form.categoryId ? [Number(form.categoryId)] : []);
+                            let current = normalizeCategoryIds(form.categoryId)
                             if (e.target.checked) {
-                              if (!current.includes(Number(c.id))) current.push(Number(c.id));
+                              if (!current.includes(String(c.id))) current.push(String(c.id))
                             } else {
-                              current = current.filter(id => id != c.id);
+                              current = current.filter(id => id !== String(c.id))
                             }
-                            setForm({ ...form, categoryId: current });
+                            setForm({ ...form, categoryId: current })
                           }}
                         /> {c.name}
                       </label>
@@ -227,16 +253,6 @@ export default function AdminBooks() {
                 <div className="form-group">
                   <label className="form-label">ISBN</label>
                   <input className="form-input" name="isbn" value={form.isbn} onChange={handleChange} />
-                </div>
-              </div>
-              <div className="admin-form-row">
-                <div className="form-group">
-                  <label className="form-label">Điểm đánh giá (1-5)</label>
-                  <input className="form-input" type="number" step="0.1" min="0" max="5" name="rating" value={form.rating} onChange={handleChange} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Số lượt đánh giá</label>
-                  <input className="form-input" type="number" min="0" name="reviews" value={form.reviews} onChange={handleChange} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 24, margin: '8px 0' }}>

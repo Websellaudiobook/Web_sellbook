@@ -20,6 +20,31 @@ export const getDiscount = (price, originalPrice) => {
   return Math.round((1 - price / originalPrice) * 100)
 }
 
+export const getReviewStats = (reviews = []) => {
+  const totalReviews = reviews.length
+  const averageRating = totalReviews
+    ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / totalReviews
+    : 0
+
+  return {
+    averageRating,
+    totalReviews
+  }
+}
+
+export const enrichBooksWithReviewStats = (books = [], reviews = []) => {
+  return books.map(book => {
+    const bookReviews = reviews.filter(review => String(review.bookId) === String(book.id))
+    const { averageRating, totalReviews } = getReviewStats(bookReviews)
+
+    return {
+      ...book,
+      averageRating,
+      totalReviews
+    }
+  })
+}
+
 export const getStatusLabel = (status) => {
   const map = {
     pending: 'Chờ xác nhận',

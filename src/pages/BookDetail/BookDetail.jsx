@@ -1,8 +1,26 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { FiShoppingCart, FiHeart, FiShare2, FiStar, FiMinus, FiPlus, FiArrowLeft, FiBook, FiCalendar, FiGlobe, FiHash } from 'react-icons/fi'
-import { getBook, getBooks } from '../../services/api'
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
+import {
+  FiShoppingCart,
+  FiHeart,
+  FiShare2,
+  FiStar,
+  FiMinus,
+  FiPlus,
+  FiArrowLeft,
+  FiBook,
+  FiCalendar,
+  FiGlobe,
+  FiHash,
+  FiMessageSquare,
+  FiEdit3,
+  FiUser,
+  FiTrash2
+} from 'react-icons/fi'
+import { getBook, getBooks, getReviewsByBook, createReview, updateReview, deleteReview, getOrders } from '../../services/api'
 import { useCart } from '../../contexts/CartContext'
+import { useWishlist } from '../../contexts/WishlistContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice, getDiscount } from '../../utils/helpers'
 import BookCard from '../../components/BookCard/BookCard'
 import { SkeletonDetail } from '../../components/Skeleton/Skeleton'
@@ -13,13 +31,29 @@ const IMG_FALLBACK = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"
 
 export default function BookDetail() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { user } = useAuth()
+  const { toggleWishlist, isWishlisted } = useWishlist()
   const [book, setBook] = useState(null)
   const [relatedBooks, setRelatedBooks] = useState([])
+  const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
-  const [activeTab, setActiveTab] = useState('description')
-  const [wishlisted, setWishlisted] = useState(false)
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') === 'reviews' ? 'reviews' : 'description')
+  const [reviewRating, setReviewRating] = useState(5)
+  const [hoverRating, setHoverRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [submittingReview, setSubmittingReview] = useState(false)
+  const [canReview, setCanReview] = useState(false)
+  const wishlisted = book ? isWishlisted(book.id) : false
+
+  useEffect(() => {
+    if (searchParams.get('tab') === 'reviews') {
+      setActiveTab('reviews')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -28,14 +62,21 @@ export default function BookDetail() {
       try {
         const res = await getBook(id)
         setBook(res.data)
-        // Fetch all books then filter client-side vì json-server không query được trong mảng categoryId
-        const catId = Array.isArray(res.data.categoryId) ? res.data.categoryId[0] : res.data.categoryId
+
+        const reviewsRes = await getReviewsByBook(id)
+        setReviews(sortReviews(reviewsRes.data))
+
+        const categoryIds = Array.isArray(res.data.categoryId) ? res.data.categoryId : [res.data.categoryId]
+        const catId = categoryIds
+          .map(id => String(id))
+          .find(id => id && id !== 'NaN' && id !== 'undefined' && id !== 'null')
         const allBooks = await getBooks()
         const related = allBooks.data
           .filter(b => {
             if (b.id === res.data.id) return false
-            if (Array.isArray(b.categoryId)) return b.categoryId.includes(Number(catId))
-            return b.categoryId == catId
+            if (!catId) return false
+            if (Array.isArray(b.categoryId)) return b.categoryId.map(id => String(id)).includes(catId)
+            return String(b.categoryId) === catId
           })
           .slice(0, 4)
         setRelatedBooks(related)
@@ -47,6 +88,47 @@ export default function BookDetail() {
     }
     fetchBook()
   }, [id])
+
+  useEffect(() => {
+    if (!user) {
+      setReviewRating(5)
+      setReviewComment('')
+      setCanReview(false)
+      return
+    }
+
+    const existingReview = reviews.find(review => String(review.userId) === String(user.id))
+    if (existingReview) {
+      setReviewRating(existingReview.rating)
+      setReviewComment(existingReview.comment)
+    } else {
+      setReviewRating(5)
+      setReviewComment('')
+    }
+  }, [reviews, user])
+
+  useEffect(() => {
+    const checkPurchase = async () => {
+      if (!user || !id) {
+        setCanReview(false)
+        return
+      }
+
+      try {
+        const res = await getOrders()
+        const purchased = res.data.some(order =>
+          String(order.userId) === String(user.id) &&
+          order.status === 'delivered' &&
+          order.items?.some(item => String(item.bookId || item.id) === String(id))
+        )
+        setCanReview(purchased)
+      } catch (err) {
+        setCanReview(false)
+      }
+    }
+
+    checkPurchase()
+  }, [id, user])
 
   if (loading) {
     return <SkeletonDetail />
@@ -64,14 +146,25 @@ export default function BookDetail() {
   }
 
   const discount = getDiscount(book.price, book.originalPrice)
+  const totalReviews = reviews.length
+  const averageRating = totalReviews
+    ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / totalReviews
+    : 0
+  const userReview = user
+    ? reviews.find(review => String(review.userId) === String(user.id))
+    : null
+  const ratingCounts = [5, 4, 3, 2, 1].map(star => ({
+    star,
+    count: reviews.filter(review => Number(review.rating) === star).length
+  }))
 
   const handleWishlist = () => {
-    setWishlisted(!wishlisted)
-    if (!wishlisted) {
-      toast.success('Đã thêm vào yêu thích! ❤️')
-    } else {
-      toast.info('Đã bỏ yêu thích')
+    if (!user) {
+      toast.info('Vui lòng đăng nhập để lưu yêu thích')
+      navigate('/login')
+      return
     }
+    toggleWishlist(book)
   }
 
   const handleShare = () => {
@@ -83,9 +176,89 @@ export default function BookDetail() {
       })
     } else {
       navigator.clipboard.writeText(window.location.href)
-      toast.success('Đã sao chép link! 🔗')
+      toast.success('Đã sao chép link!')
     }
   }
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault()
+
+    if (!user) {
+      toast.info('Vui lòng đăng nhập để viết đánh giá')
+      navigate('/login')
+      return
+    }
+
+    if (!canReview) {
+      toast.info('Bạn cần mua sách và nhận hàng thành công trước khi đánh giá')
+      return
+    }
+
+    if (!reviewRating) {
+      toast.warning('Vui lòng chọn số sao đánh giá')
+      return
+    }
+
+    if (!reviewComment.trim()) {
+      toast.warning('Vui lòng nhập nội dung bình luận')
+      return
+    }
+
+    setSubmittingReview(true)
+    try {
+      const payload = {
+        bookId: String(book.id),
+        userId: String(user.id),
+        userName: user.name || user.email || 'Người dùng',
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+        createdAt: new Date().toISOString()
+      }
+
+      if (userReview) {
+        await updateReview(userReview.id, payload)
+        toast.success('Cập nhật đánh giá thành công!')
+      } else {
+        await createReview(payload)
+        toast.success('Gửi đánh giá thành công!')
+      }
+
+      const reviewsRes = await getReviewsByBook(id)
+      setReviews(sortReviews(reviewsRes.data))
+    } catch (err) {
+      toast.error(err.friendlyMessage || 'Có lỗi xảy ra khi gửi đánh giá!')
+    } finally {
+      setSubmittingReview(false)
+    }
+  }
+
+  const handleDeleteOwnReview = async () => {
+    if (!userReview) return
+    if (!window.confirm('Bạn chắc chắn muốn xóa đánh giá này?')) return
+
+    try {
+      await deleteReview(userReview.id)
+      toast.success('Đã xóa đánh giá')
+      setReviewRating(5)
+      setReviewComment('')
+      const reviewsRes = await getReviewsByBook(id)
+      setReviews(sortReviews(reviewsRes.data))
+    } catch (err) {
+      toast.error(err.friendlyMessage || 'Không thể xóa đánh giá')
+    }
+  }
+
+  const renderStars = (rating, className = '') => (
+    <div className={`stars ${className}`}>
+      {[1, 2, 3, 4, 5].map(i => (
+        <FiStar
+          key={i}
+          className={`star ${i <= Math.round(rating) ? '' : 'empty'}`}
+          fill={i <= Math.round(rating) ? '#f59e0b' : 'none'}
+        />
+      ))}
+    </div>
+  )
 
   return (
     <div className="book-detail page-enter">
@@ -95,7 +268,6 @@ export default function BookDetail() {
         </Link>
 
         <div className="detail-grid">
-          {/* Image */}
           <div className="detail-image-wrapper">
             <div className="detail-image">
               <img
@@ -107,25 +279,16 @@ export default function BookDetail() {
             </div>
           </div>
 
-          {/* Info */}
           <div className="detail-info">
             {book.bestseller && <span className="badge badge-warning">🔥 Best Seller</span>}
             <h1 className="detail-title">{book.title}</h1>
             <p className="detail-author">Tác giả: <strong>{book.author}</strong></p>
 
             <div className="detail-rating">
-              <div className="stars">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <FiStar
-                    key={i}
-                    className={`star ${i <= Math.round(book.rating) ? '' : 'empty'}`}
-                    fill={i <= Math.round(book.rating) ? '#f59e0b' : 'none'}
-                  />
-                ))}
-              </div>
-              <span>{book.rating}</span>
+              {renderStars(averageRating)}
+              <span>{totalReviews ? averageRating.toFixed(1) : 'Chưa có'}</span>
               <span className="rating-divider">|</span>
-              <span>{book.reviews} đánh giá</span>
+              <span>{totalReviews} đánh giá</span>
             </div>
 
             <div className="detail-price-box">
@@ -161,7 +324,14 @@ export default function BookDetail() {
               </div>
               <button
                 className="btn btn-primary btn-lg"
-                onClick={() => addToCart(book, quantity)}
+                onClick={() => {
+                  if (!user) {
+                    toast.info('Vui lòng đăng nhập để thêm vào giỏ hàng')
+                    navigate('/login')
+                    return
+                  }
+                  addToCart(book, quantity)
+                }}
                 disabled={book.stock === 0}
               >
                 <FiShoppingCart /> Thêm vào giỏ hàng
@@ -182,7 +352,6 @@ export default function BookDetail() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="detail-tabs">
           <div className="tabs-header">
             <button
@@ -196,6 +365,12 @@ export default function BookDetail() {
               onClick={() => setActiveTab('details')}
             >
               Thông tin chi tiết
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+              onClick={() => setActiveTab('reviews')}
+            >
+              Đánh giá ({totalReviews})
             </button>
           </div>
           <div className="tab-content">
@@ -218,10 +393,123 @@ export default function BookDetail() {
                 </table>
               </div>
             )}
+            {activeTab === 'reviews' && (
+              <div className="tab-pane animate-fade-in">
+                <div className="reviews-panel">
+                  <section className="review-summary">
+                    <div className="review-score">
+                      <span className="review-score-number">{totalReviews ? averageRating.toFixed(1) : '0.0'}</span>
+                      <span className="review-score-max">/5</span>
+                      {renderStars(averageRating, 'review-score-stars')}
+                      <p>{totalReviews} đánh giá</p>
+                    </div>
+
+                    <div className="rating-breakdown">
+                      {ratingCounts.map(({ star, count }) => {
+                        const percent = totalReviews ? Math.round((count / totalReviews) * 100) : 0
+                        return (
+                          <div className="rating-row" key={star}>
+                            <span>{star} sao</span>
+                            <div className="rating-track">
+                              <div className="rating-fill" style={{ width: `${percent}%` }} />
+                            </div>
+                            <span>{percent}%</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </section>
+
+                  <section className="review-form-section">
+                    <h3><FiEdit3 /> {userReview ? 'Cập nhật đánh giá' : 'Viết đánh giá'}</h3>
+                    {user && canReview ? (
+                      <form className="review-form" onSubmit={handleSubmitReview}>
+                        <div className="review-star-picker" onMouseLeave={() => setHoverRating(0)}>
+                          <span>Chọn sao:</span>
+                          <div className="review-star-buttons">
+                            {[1, 2, 3, 4, 5].map(star => {
+                              const active = star <= (hoverRating || reviewRating)
+                              return (
+                                <button
+                                  type="button"
+                                  key={star}
+                                  className={`review-star-btn ${active ? 'active' : ''}`}
+                                  onMouseEnter={() => setHoverRating(star)}
+                                  onClick={() => setReviewRating(star)}
+                                  aria-label={`${star} sao`}
+                                >
+                                  <FiStar fill={active ? '#f59e0b' : 'none'} />
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                        <textarea
+                          className="form-textarea"
+                          value={reviewComment}
+                          onChange={(e) => setReviewComment(e.target.value)}
+                          placeholder="Nhập bình luận của bạn..."
+                          rows={4}
+                        />
+                        <div className="review-form-actions">
+                          {userReview && (
+                            <button className="btn btn-danger" type="button" onClick={handleDeleteOwnReview}>
+                              <FiTrash2 /> Xóa đánh giá
+                            </button>
+                          )}
+                          <button className="btn btn-primary" type="submit" disabled={submittingReview}>
+                            {submittingReview ? 'Đang gửi...' : userReview ? 'Cập nhật đánh giá' : 'Gửi đánh giá'}
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className="review-login-box">
+                        <p>
+                          {user
+                            ? 'Bạn cần mua sách và nhận hàng thành công trước khi đánh giá.'
+                            : 'Vui lòng đăng nhập để viết đánh giá cho cuốn sách này.'}
+                        </p>
+                        {!user && (
+                          <button className="btn btn-primary" onClick={() => navigate('/login')}>Đăng nhập</button>
+                        )}
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="review-list-section">
+                    <h3><FiMessageSquare /> Bình luận ({totalReviews})</h3>
+                    {reviews.length > 0 ? (
+                      <div className="review-list">
+                        {reviews.map(review => (
+                          <article className="review-item" key={review.id}>
+                            <div className="review-avatar"><FiUser /></div>
+                            <div className="review-body">
+                              <div className="review-head">
+                                <div>
+                                  <h4>{review.userName}</h4>
+                                  {renderStars(review.rating, 'review-item-stars')}
+                                </div>
+                                <time>{new Date(review.createdAt).toLocaleDateString('vi-VN')}</time>
+                              </div>
+                              <p>{review.comment}</p>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="empty-state review-empty">
+                        <FiMessageSquare className="review-empty-icon" />
+                        <h3 className="empty-state-title">Chưa có đánh giá</h3>
+                        <p className="empty-state-text">Hãy là người đầu tiên chia sẻ cảm nhận về cuốn sách này.</p>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Related */}
         {relatedBooks.length > 0 && (
           <div className="related-section">
             <h2 className="section-title">Sách liên quan</h2>
@@ -233,4 +521,8 @@ export default function BookDetail() {
       </div>
     </div>
   )
+}
+
+function sortReviews(reviews) {
+  return [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 }

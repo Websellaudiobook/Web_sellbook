@@ -62,4 +62,28 @@ export const createOrder = (data) => api.post('/orders', data)
 export const updateOrder = (id, data) => api.put(`/orders/${id}`, data)
 export const deleteOrder = (id) => api.delete(`/orders/${id}`)
 
+// ===== DISCOUNTS =====
+export const getDiscounts = () => api.get('/discounts')
+export const createDiscount = (data) => api.post('/discounts', data)
+export const updateDiscount = (id, data) => api.put(`/discounts/${id}`, data)
+export const deleteDiscount = (id) => api.delete(`/discounts/${id}`)
+
+// ===== SUBSCRIBERS =====
+export const getSubscribers = () => api.get('/subscribers')
+export const createSubscriber = (data) => api.post('/subscribers', data)
+export const deleteSubscriber = (id) => api.delete(`/subscribers/${id}`)
+
+// ===== REVIEWS =====
+export const getReviews = () => api.get('/reviews')
+export const getReviewsByBook = async (bookId) => {
+  const res = await api.get('/reviews')
+  return {
+    ...res,
+    data: res.data.filter(review => String(review.bookId) === String(bookId))
+  }
+}
+export const createReview = (data) => api.post('/reviews', data)
+export const updateReview = (id, data) => api.patch(`/reviews/${id}`, data)
+export const deleteReview = (id) => api.delete(`/reviews/${id}`)
+
 export default api

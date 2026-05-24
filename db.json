@@ -32,6 +32,17 @@
       "avatar": "",
       "createdAt": "2026-05-11T12:20:28.397Z",
       "id": "MjGaZ4kBAl4"
+    },
+    {
+      "name": "ạdksad",
+      "email": "hianhem@gmail.com",
+      "password": "khacdai24",
+      "phone": "0982980324",
+      "address": "kajdasd",
+      "role": "user",
+      "avatar": "",
+      "createdAt": "2026-05-18T14:46:05.321Z",
+      "id": "dR8dCyN9oeE"
     }
   ],
   "categories": [
@@ -70,6 +81,12 @@
       "description": "Truyện tranh, sách giáo dục",
       "image": "https://img.magnific.com/vector-cao-cap/vector-mien-phi-nen-ky-niem-ngay-quoc-te-thieu-nhi-phang_705652-591.jpg?semt=ais_hybrid&w=740&q=80",
       "id": "6"
+    },
+    {
+      "name": "Khác ABC",
+      "description": "",
+      "image": "",
+      "id": "6R6uQHz2qWU"
     }
   ],
   "books": [
@@ -82,11 +99,12 @@
       "originalPrice": 108000,
       "image": "https://i.ebayimg.com/images/g/ISMAAOSwUB5m7F0T/s-l1600.webp",
       "categoryId": [
-        3
+        3,
+        4,
+        6,
+        null
       ],
-      "stock": 150,
-      "rating": 4.8,
-      "reviews": 2450,
+      "stock": 149,
       "publisher": "NXB Tổng hợp TP.HCM",
       "publishYear": 2021,
       "pages": 320,
@@ -95,7 +113,7 @@
       "featured": true,
       "bestseller": true,
       "createdAt": "2026-01-01T00:00:00Z",
-      "sold": 1
+      "sold": 8
     },
     {
       "id": "2",
@@ -106,11 +124,12 @@
       "originalPrice": 79000,
       "image": "https://salt.tikicdn.com/cache/750x750/ts/product/45/3b/fc/aa81d0a534b45706ae1eee1e344e80d9.jpg.webp",
       "categoryId": [
-        1
+        "1",
+        "0",
+        "6",
+        "6R6uQHz2qWU"
       ],
-      "stock": 200,
-      "rating": 4.7,
-      "reviews": 1890,
+      "stock": 199,
       "publisher": "NXB Hội Nhà Văn",
       "publishYear": 2020,
       "pages": 228,
@@ -118,7 +137,8 @@
       "isbn": "978-604-77-8888-8",
       "featured": true,
       "bestseller": true,
-      "createdAt": "2026-01-05T00:00:00Z"
+      "createdAt": "2026-01-05T00:00:00Z",
+      "sold": 2
     },
     {
       "id": "3",
@@ -129,11 +149,10 @@
       "originalPrice": 249000,
       "image": "https://static.oreka.vn/800-800_8bdada62-25ef-4e78-9a5c-06933135c335.webp",
       "categoryId": [
-        3
+        3,
+        null
       ],
-      "stock": 80,
-      "rating": 4.9,
-      "reviews": 3200,
+      "stock": 79,
       "publisher": "NXB Tri Thức",
       "publishYear": 2022,
       "pages": 550,
@@ -141,7 +160,8 @@
       "isbn": "978-604-77-9999-9",
       "featured": true,
       "bestseller": false,
-      "createdAt": "2026-01-10T00:00:00Z"
+      "createdAt": "2026-01-10T00:00:00Z",
+      "sold": 0
     },
     {
       "id": "4",
@@ -152,11 +172,10 @@
       "originalPrice": 239000,
       "image": "https://static.oreka.vn/800-800_6754d9d9-3a0a-46e8-9493-43c71e0c9486",
       "categoryId": [
-        5
+        "5",
+        "6R6uQHz2qWU"
       ],
       "stock": 60,
-      "rating": 4.6,
-      "reviews": 980,
       "publisher": "NXB Thế Giới",
       "publishYear": 2021,
       "pages": 600,
@@ -164,7 +183,8 @@
       "isbn": "978-604-77-1111-1",
       "featured": false,
       "bestseller": true,
-      "createdAt": "2026-01-15T00:00:00Z"
+      "createdAt": "2026-01-15T00:00:00Z",
+      "sold": 0
     },
     {
       "id": "5",
@@ -178,8 +198,6 @@
         4
       ],
       "stock": 45,
-      "rating": 4.9,
-      "reviews": 1560,
       "publisher": "Pearson",
       "publishYear": 2023,
       "pages": 464,
@@ -187,7 +205,8 @@
       "isbn": "978-0-13-235088-4",
       "featured": true,
       "bestseller": false,
-      "createdAt": "2026-02-01T00:00:00Z"
+      "createdAt": "2026-02-01T00:00:00Z",
+      "sold": 0
     },
     {
       "id": "6",
@@ -201,8 +220,6 @@
         1
       ],
       "stock": 120,
-      "rating": 4.3,
-      "reviews": 670,
       "publisher": "NXB Hội Nhà Văn",
       "publishYear": 2020,
       "pages": 180,
@@ -225,8 +242,6 @@
         2
       ],
       "stock": 90,
-      "rating": 4.5,
-      "reviews": 1230,
       "publisher": "NXB Lao Động",
       "publishYear": 2021,
       "pages": 256,
@@ -234,7 +249,8 @@
       "isbn": "978-604-77-3333-3",
       "featured": false,
       "bestseller": true,
-      "createdAt": "2026-02-10T00:00:00Z"
+      "createdAt": "2026-02-10T00:00:00Z",
+      "sold": 0
     },
     {
       "id": "8",
@@ -248,8 +264,6 @@
         6
       ],
       "stock": 500,
-      "rating": 4.8,
-      "reviews": 5600,
       "publisher": "NXB Kim Đồng",
       "publishYear": 2022,
       "pages": 192,
@@ -257,7 +271,8 @@
       "isbn": "978-604-77-4444-4",
       "featured": false,
       "bestseller": true,
-      "createdAt": "2026-02-15T00:00:00Z"
+      "createdAt": "2026-02-15T00:00:00Z",
+      "sold": 0
     },
     {
       "id": "9",
@@ -271,8 +286,6 @@
         3
       ],
       "stock": 70,
-      "rating": 4.7,
-      "reviews": 2100,
       "publisher": "NXB Trẻ",
       "publishYear": 2021,
       "pages": 280,
@@ -280,7 +293,8 @@
       "isbn": "978-604-77-5555-5",
       "featured": true,
       "bestseller": false,
-      "createdAt": "2026-03-01T00:00:00Z"
+      "createdAt": "2026-03-01T00:00:00Z",
+      "sold": 3
     },
     {
       "id": "10",
@@ -294,8 +308,6 @@
         2
       ],
       "stock": 110,
-      "rating": 4.4,
-      "reviews": 1870,
       "publisher": "NXB Tổng hợp TP.HCM",
       "publishYear": 2022,
       "pages": 340,
@@ -304,7 +316,7 @@
       "featured": false,
       "bestseller": true,
       "createdAt": "2026-03-05T00:00:00Z",
-      "sold": 4
+      "sold": 5
     },
     {
       "id": "11",
@@ -315,9 +327,7 @@
       "originalPrice": 350000,
       "image": "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400",
       "categoryId": 4,
-      "stock": 35,
-      "rating": 4.6,
-      "reviews": 890,
+      "stock": 6,
       "publisher": "O'Reilly",
       "publishYear": 2023,
       "pages": 176,
@@ -325,7 +335,8 @@
       "isbn": "978-0-596-51774-8",
       "featured": false,
       "bestseller": false,
-      "createdAt": "2026-03-10T00:00:00Z"
+      "createdAt": "2026-03-10T00:00:00Z",
+      "sold": 1
     },
     {
       "id": "12",
@@ -339,8 +350,6 @@
         5
       ],
       "stock": 180,
-      "rating": 4.2,
-      "reviews": 2340,
       "publisher": "NXB Hội Nhà Văn",
       "publishYear": 2020,
       "pages": 285,
@@ -348,7 +357,8 @@
       "isbn": "978-604-77-0000-0",
       "featured": false,
       "bestseller": true,
-      "createdAt": "2026-03-15T00:00:00Z"
+      "createdAt": "2026-03-15T00:00:00Z",
+      "sold": 1
     },
     {
       "title": "Dế mèn phiêu lưu ký",
@@ -361,9 +371,7 @@
         1,
         6
       ],
-      "stock": 231,
-      "rating": 4.5,
-      "reviews": 3618,
+      "stock": 224,
       "publisher": "Kim Đồng",
       "publishYear": 1941,
       "pages": 150,
@@ -373,7 +381,7 @@
       "bestseller": true,
       "createdAt": "2026-05-11T16:05:50.303Z",
       "id": "20fRllNjhp8",
-      "sold": 2
+      "sold": 9
     }
   ],
   "orders": [
@@ -772,6 +780,346 @@
       "note": "",
       "createdAt": "2026-05-16T15:35:03.016Z",
       "id": "80TW6cAKqzk"
+    },
+    {
+      "userId": "2",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 2
+        },
+        {
+          "bookId": "9",
+          "title": "Lược Sử Thời Gian",
+          "price": 120000,
+          "quantity": 3
+        }
+      ],
+      "total": 532000,
+      "status": "delivered",
+      "shippingAddress": "TP. Hồ Chí Minh, Việt Nam",
+      "phone": "0909876543",
+      "paymentMethod": "cod",
+      "note": "ÁLKJDSAD",
+      "createdAt": "2026-05-18T14:41:00.579Z",
+      "id": "g_i5exm9qaE"
+    },
+    {
+      "userId": "2",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        }
+      ],
+      "total": 80000,
+      "status": "pending",
+      "shippingAddress": "TP. Hồ Chí Minh, Việt Nam",
+      "phone": "0909876543",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-18T14:41:12.948Z",
+      "id": "kCoOi--7IPg"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 6
+        }
+      ],
+      "total": 300000,
+      "status": "delivered",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0329966581",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T01:20:45.043Z",
+      "id": "k1_gErf3qao"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 3
+        }
+      ],
+      "total": 288000,
+      "status": "delivered",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "dradgdh",
+      "createdAt": "2026-05-24T08:11:38.311Z",
+      "id": "32aSnTK8B5k"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 2
+        }
+      ],
+      "total": 202000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "hfdhgh",
+      "createdAt": "2026-05-24T08:12:43.287Z",
+      "id": "7yIGUurIKGU"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 2
+        }
+      ],
+      "total": 202000,
+      "status": "cancelled",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T08:15:19.854Z",
+      "id": "pK80Q8uFFB8",
+      "cancelledAt": "2026-05-24T08:22:49.432Z"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "2",
+          "title": "Nhà Giả Kim",
+          "price": 69000,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 69000,
+      "discountCode": null,
+      "discountPercent": 0,
+      "discountAmount": 0,
+      "shippingFee": 30000,
+      "total": 99000,
+      "status": "delivered",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T08:33:12.640Z",
+      "id": "woL0omc0Yyg",
+      "cancelledAt": null,
+      "deliveredAt": "2026-05-24T08:34:42.160Z"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 6
+        }
+      ],
+      "subtotal": 300000,
+      "discountCode": null,
+      "discountPercent": 0,
+      "discountAmount": 0,
+      "shippingFee": 0,
+      "total": 300000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T08:34:08.541Z",
+      "id": "Q_EJVRp-EOI"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "11",
+          "title": "JavaScript: The Good Parts",
+          "price": 280000,
+          "quantity": 20
+        }
+      ],
+      "subtotal": 5600000,
+      "discountCode": "ADD",
+      "discountPercent": 10,
+      "discountAmount": 560000,
+      "shippingFee": 0,
+      "total": 5040000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T08:44:24.767Z",
+      "id": "oipoAKIkiM4"
+    },
+    {
+      "userId": "1",
+      "items": [
+        {
+          "bookId": "11",
+          "title": "JavaScript: The Good Parts",
+          "price": 280000,
+          "quantity": 9
+        }
+      ],
+      "subtotal": 2520000,
+      "discountCode": null,
+      "discountPercent": 0,
+      "discountAmount": 0,
+      "shippingFee": 0,
+      "total": 2520000,
+      "status": "pending",
+      "shippingAddress": "Hà Nội, Việt Nam",
+      "phone": "0901234567",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T08:44:58.294Z",
+      "id": "237r4_TxieM"
+    },
+    {
+      "userId": "2",
+      "items": [
+        {
+          "bookId": "1",
+          "title": "Đắc Nhân Tâm",
+          "price": 86000,
+          "quantity": 1
+        },
+        {
+          "bookId": "20fRllNjhp8",
+          "title": "Dế mèn phiêu lưu ký",
+          "price": 50000,
+          "quantity": 1
+        },
+        {
+          "bookId": "3",
+          "title": "Sapiens: Lược Sử Loài Người",
+          "price": 199000,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 335000,
+      "discountCode": null,
+      "discountPercent": 0,
+      "discountAmount": 0,
+      "shippingFee": 0,
+      "total": 335000,
+      "status": "pending",
+      "shippingAddress": "TP. Hồ Chí Minh, Việt Nam",
+      "phone": "0909876543",
+      "paymentMethod": "cod",
+      "note": "",
+      "createdAt": "2026-05-24T08:50:51.989Z",
+      "id": "wm7K7MCsm1c"
+    }
+  ],
+  "discounts": [
+    {
+      "id": "1",
+      "code": "BOOKVERSE10",
+      "percent": 10,
+      "active": true,
+      "expiresAt": null,
+      "createdAt": "2026-05-18T00:00:00Z"
+    },
+    {
+      "code": "ADD",
+      "percent": 10,
+      "active": true,
+      "expiresAt": "2026-08-23",
+      "id": "hcI94wtNRtw"
+    }
+  ],
+  "subscribers": [
+    {
+      "email": "khacdai24moon@gmail.com",
+      "createdAt": "2026-05-18T15:31:28.866Z",
+      "id": "G7ZAeyw1mkk"
+    },
+    {
+      "email": "haivinh2092006@gmail.com",
+      "createdAt": "2026-05-24T08:21:57.704Z",
+      "id": "DTNao_C-bpo"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "1",
+      "bookId": "1",
+      "userId": "2",
+      "userName": "Nguyễn Văn A",
+      "rating": 5,
+      "comment": "Cuốn sách rất hay và bổ ích! Đã thay đổi hoàn toàn cách tôi giao tiếp với mọi người xung quanh. Rất khuyến khích mọi người nên đọc.",
+      "createdAt": "2026-05-01T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "bookId": "1",
+      "userId": "1",
+      "userName": "Admin",
+      "rating": 4,
+      "comment": "Nội dung tốt, dễ hiểu, phù hợp cho mọi lứa tuổi. Tuy nhiên một số phần hơi lặp lại.",
+      "createdAt": "2026-05-05T14:30:00Z"
+    },
+    {
+      "id": "3",
+      "bookId": "2",
+      "userId": "2",
+      "userName": "Nguyễn Văn A",
+      "rating": 5,
+      "comment": "Một cuốn sách kinh điển về tư duy làm giàu. Đã đọc đi đọc lại nhiều lần và luôn tìm thấy điều mới.",
+      "createdAt": "2026-05-10T09:15:00Z"
+    },
+    {
+      "bookId": "20fRllNjhp8",
+      "userId": "1",
+      "userName": "Admin",
+      "rating": 3,
+      "comment": "sách hay",
+      "createdAt": "2026-05-24T08:34:19.531Z",
+      "id": "IzHnexkOtdI"
+    },
+    {
+      "bookId": "2",
+      "userId": "1",
+      "userName": "Admin",
+      "rating": 5,
+      "comment": "sách này không hay lắm",
+      "createdAt": "2026-05-24T08:35:03.821Z",
+      "id": "ZCvHsx62hwc"
+    },
+    {
+      "bookId": "9",
+      "userId": "2",
+      "userName": "Nguyễn Văn A",
+      "rating": 5,
+      "comment": "hay lắm",
+      "createdAt": "2026-05-24T08:51:30.678Z",
+      "id": "b6IQ0N-XxC4"
     }
   ],
   "cart": [],

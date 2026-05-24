@@ -48,7 +48,9 @@ export function AuthProvider({ children }) {
     try {
       // Check if email already exists
       const existing = await getUsers()
-      const emailExists = existing.data.find(u => u.email === userData.email)
+      const emailExists = existing.data.find(u =>
+        String(u.email || '').toLowerCase() === String(userData.email || '').toLowerCase()
+      )
       if (emailExists) {
         toast.error('Email đã được sử dụng!')
         return { success: false }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { FiShoppingBag, FiEdit2 } from 'react-icons/fi'
-import { getOrders, updateOrder, getBook, updateBook } from '../../services/api'
+import { getOrders, updateOrder, getBook, updateBook, getReviews } from '../../services/api'
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/helpers'
 import { toast } from 'react-toastify'
 import { ORDER_STATUSES } from '../../utils/constants'
@@ -8,31 +9,82 @@ import './Admin.css'
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([])
+  const [reviews, setReviews] = useState([])
   const [editOrder, setEditOrder] = useState(null)
   const [newStatus, setNewStatus] = useState('')
 
   const fetchData = async () => {
-    const res = await getOrders()
-    setOrders(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+    const [ordersRes, reviewsRes] = await Promise.all([getOrders(), getReviews()])
+    setOrders(ordersRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+    setReviews(reviewsRes.data)
   }
 
   useEffect(() => { fetchData() }, [])
 
   const handleStatusUpdate = async () => {
     try {
-      if (newStatus === 'delivered' && editOrder.status !== 'delivered') {
-        for (const item of editOrder.items) {
-          try {
-            const bookRes = await getBook(item.bookId || item.id)
-            if (bookRes && bookRes.data) {
-              const bookData = bookRes.data
-              await updateBook(bookData.id, { ...bookData, sold: (bookData.sold || 0) + item.quantity })
-            }
-          } catch(err) { console.error('Failed to update book sold count:', err) }
+      if (newStatus === editOrder.status) {
+        setEditOrder(null)
+        return
+      }
+
+      const booksToUpdate = await Promise.all(
+        editOrder.items.map(async item => {
+          const bookRes = await getBook(item.bookId || item.id)
+          return { item, book: bookRes.data }
+        })
+      )
+
+      if (editOrder.status === 'cancelled' && newStatus !== 'cancelled') {
+        const stockErrors = booksToUpdate
+          .filter(({ item, book }) => Number(book.stock || 0) < Number(item.quantity || 0))
+          .map(({ item, book }) => `"${item.title}" chỉ còn ${book.stock || 0} sản phẩm`)
+
+        if (stockErrors.length > 0) {
+          toast.error(stockErrors.join(', '))
+          return
         }
       }
+
+      await Promise.all(
+        booksToUpdate.map(({ item, book }) => {
+          const quantity = Number(item.quantity || 0)
+          let stock = Number(book.stock || 0)
+          let sold = Number(book.sold || 0)
+
+          if (editOrder.status !== 'cancelled' && newStatus === 'cancelled') {
+            stock += quantity
+          }
+
+          if (editOrder.status === 'cancelled' && newStatus !== 'cancelled') {
+            stock = Math.max(0, stock - quantity)
+          }
+
+          if (editOrder.status !== 'delivered' && newStatus === 'delivered') {
+            sold += quantity
+          }
+
+          if (editOrder.status === 'delivered' && newStatus !== 'delivered') {
+            sold = Math.max(0, sold - quantity)
+          }
+
+          return updateBook(book.id, { ...book, stock, sold })
+        })
+      )
       
-      await updateOrder(editOrder.id, { ...editOrder, status: newStatus })
+      try {
+        await updateOrder(editOrder.id, {
+          ...editOrder,
+          status: newStatus,
+          cancelledAt: newStatus === 'cancelled' ? new Date().toISOString() : editOrder.cancelledAt || null,
+          deliveredAt: newStatus === 'delivered' ? new Date().toISOString() : editOrder.deliveredAt || null
+        })
+      } catch (err) {
+        await Promise.allSettled(
+          booksToUpdate.map(({ book }) => updateBook(book.id, book))
+        )
+        throw err
+      }
       toast.success('Cập nhật trạng thái thành công!')
       setEditOrder(null)
       fetchData()
@@ -125,7 +177,16 @@ export default function AdminOrders() {
                       <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.title}</span>
                       <span style={{ color: 'var(--text-muted)' }}>x{item.quantity}</span>
                     </div>
-                    <span style={{ color: 'var(--text-primary)' }}>{formatPrice(item.price * item.quantity)}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      {getOrderItemReview(editOrder, item, reviews) ? (
+                        <Link className="btn btn-secondary btn-sm" to={`/books/${item.bookId || item.id}?tab=reviews`}>
+                          Đã đánh giá
+                        </Link>
+                      ) : editOrder.status === 'delivered' ? (
+                        <span className="badge badge-warning">Chưa đánh giá</span>
+                      ) : null}
+                      <span style={{ color: 'var(--text-primary)' }}>{formatPrice(item.price * item.quantity)}</span>
+                    </div>
                   </div>
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, paddingTop: 16, borderTop: '1px dashed var(--border-color)', fontWeight: 700, fontSize: '1.1rem' }}>
@@ -154,5 +215,12 @@ export default function AdminOrders() {
         </div>
       )}
     </div>
+  )
+}
+
+function getOrderItemReview(order, item, reviews) {
+  return reviews.find(review =>
+    String(review.userId) === String(order.userId) &&
+    String(review.bookId) === String(item.bookId || item.id)
   )
 }

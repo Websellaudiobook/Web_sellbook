@@ -1,102 +1,209 @@
-# 📊 Báo Cáo Kiểm Thử (QA Testing Report) - Website BookVerse
-
-**Người kiểm thử:** QA Tester (AI)
-**Môi trường:** Localhost (http://localhost:3000)
-**Nền tảng:** Desktop & Mobile Browser (Mô phỏng)
-
----
-
-## 🎯 Tổng quan kết quả (Executive Summary)
-
-Quá trình kiểm thử khám phá (Exploratory Testing) đã được thực hiện trên các luồng nghiệp vụ cốt lõi của website BookVerse: Đăng nhập/Đăng ký, Duyệt sản phẩm, Giỏ hàng, Thanh toán và Quản lý tài khoản. 
-
-Hệ thống hoạt động tương đối ổn định về mặt luồng cơ bản (Happy Path). Tuy nhiên, vẫn tồn tại một số vấn đề liên quan đến **Xác thực dữ liệu (Data Validation)**, **Trải nghiệm người dùng (UX)** và **Responsive trên thiết bị di động**.
-
-Dưới đây là chi tiết các lỗi (Bugs) được phát hiện:
+# 📋 BÁO CÁO KIỂM THỬ NGHIỆP VỤ (QA Testing Report)
+**Dự án:** BookVerse – Website Bán Sách  
+**Người kiểm thử:** QA Tester (AI Static Code Review)  
+**Ngày:** 2026-05-16  
+**Phạm vi:** Static Code Review + Data Analysis (db.json)
 
 ---
 
-## 1. Kiểm tra chức năng (Functional Testing)
+## 🎯 Tổng quan kết quả
 
-### 🐛 [BUG-001] Lỗi hiển thị sai hình ảnh sản phẩm
-* **Mô tả:** Hình ảnh bìa sách không khớp với thông tin sách trong cơ sở dữ liệu. Cụ thể, cuốn "JavaScript: The Good Parts" đang hiển thị hình ảnh bìa của một cuốn sách khác.
-* **Các bước tái hiện:**
-  1. Truy cập trang "Sách".
-  2. Chọn bộ lọc danh mục "Công nghệ".
-  3. Cuộn đến sản phẩm "JavaScript: The Good Parts" và quan sát hình ảnh.
-* **Kết quả mong đợi:** Hiển thị đúng bìa sách "JavaScript: The Good Parts".
-* **Kết quả thực tế:** Hiển thị bìa sách khác (sai lệch dữ liệu).
-* **Mức độ:** `Low` (Ảnh hưởng hiển thị, không ảnh hưởng nghiệp vụ).
+Kiểm thử bằng phân tích tĩnh mã nguồn và dữ liệu thực tế trong `db.json`. Tổng cộng phát hiện **15 lỗi**:
 
-### 🐛 [BUG-002] Form thanh toán không xác thực số điện thoại
-* **Mô tả:** Hệ thống cho phép người dùng đặt hàng thành công ngay cả khi nhập các ký tự chữ cái (không phải số) vào trường Số điện thoại.
-* **Các bước tái hiện:**
-  1. Thêm một sản phẩm bất kỳ vào giỏ hàng.
-  2. Đi tới trang Thanh toán (Checkout).
-  3. Điền địa chỉ hợp lệ và nhập "abc" vào trường số điện thoại.
-  4. Nhấn nút "Đặt hàng".
-* **Kết quả mong đợi:** Form báo lỗi đỏ ở trường số điện thoại, yêu cầu nhập đúng định dạng số và không cho phép submit.
-* **Kết quả thực tế:** Đơn hàng được tạo thành công và lưu vào cơ sở dữ liệu với số điện thoại "abc".
-* **Mức độ:** `High` (Sai lệch dữ liệu giao hàng nghiêm trọng).
-
-### 🐛 [BUG-003] Thiếu phản hồi (Feedback) sau khi đặt hàng thành công
-* **Mô tả:** Sau khi nhấn "Đặt hàng", giỏ hàng bị xóa nhưng không có bất kỳ thông báo trực quan nào (trang cảm ơn, popup thông báo, hay chuyển hướng) để báo cho người dùng biết đơn hàng đã thành công.
-* **Các bước tái hiện:**
-  1. Hoàn tất việc điền thông tin thanh toán.
-  2. Nhấn nút "Đặt hàng".
-* **Kết quả mong đợi:** Hệ thống hiển thị thông báo "Đặt hàng thành công" hoặc chuyển hướng sang trang "Cảm ơn quý khách".
-* **Kết quả thực tế:** Hệ thống xử lý ngầm, giỏ hàng trở nên trống rỗng nhưng giao diện không thay đổi trạng thái rõ ràng.
-* **Mức độ:** `Medium` (Gây hoang mang cho người dùng, có thể dẫn đến việc họ đặt hàng nhiều lần).
-
-### 🐛 [BUG-004] Thiếu tính năng Mã giảm giá (Discount Code)
-* **Mô tả:** Theo yêu cầu của website thương mại điện tử, giỏ hàng cần có phần áp dụng mã giảm giá nhưng trên giao diện hiện tại không tìm thấy trường nhập liệu này.
-* **Mức độ:** `Medium` (Thiếu tính năng chức năng).
+| Mức độ | Số lượng |
+|--------|---------|
+| 🔴 Critical | 2 |
+| 🟠 High | 5 |
+| 🟡 Medium | 5 |
+| 🟢 Low | 3 |
 
 ---
 
-## 2. Kiểm tra giao diện và UX (UI/UX Testing)
+## 🔐 NHÓM 1: Tài khoản người dùng & Xác thực
 
-### 🐛 [BUG-005] Lỗi Responsive trên thiết bị di động (Mobile/Tablet)
-* **Mô tả:** Bố cục trang web bị vỡ khi xem trên màn hình nhỏ (ví dụ: độ phân giải 400px của điện thoại). Header bị chồng chéo các phần tử, thiếu Menu Hamburger để điều hướng gọn gàng.
-* **Các bước tái hiện:**
-  1. Mở trang web.
-  2. Thu nhỏ kích thước cửa sổ trình duyệt xuống dưới 768px (hoặc dùng DevTools chuyển sang chế độ Mobile).
-* **Kết quả mong đợi:** Giao diện co giãn mượt mà, thanh điều hướng ngang chuyển thành Menu Hamburger ẩn.
-* **Kết quả thực tế:** Các nút bấm và chữ bị ép sát vào nhau, khó thao tác.
-* **Mức độ:** `High` (Làm giảm nghiêm trọng trải nghiệm của người dùng mobile).
+### 🐛 [BUG-001] Mật khẩu lưu dạng plaintext
 
-### 🐛 [BUG-006] Cảnh báo thuộc tính `autocomplete` ở Form đăng nhập
-* **Mô tả:** Các trường `email` và `password` trong form đăng nhập thiếu thuộc tính `autocomplete`, khiến trình duyệt đưa ra cảnh báo và khó tự động điền mật khẩu.
-* **Mức độ:** `Low` (Chỉ là cảnh báo UX).
+- **Mô tả:** `AuthContext.jsx` dòng 31 so sánh password trực tiếp client-side. Toàn bộ mật khẩu lưu plaintext trong `db.json`. Gọi `GET /users` trả về credential của mọi người dùng.
+- **Bước tái hiện:** Mở `db.json` hoặc gọi `GET /users` → thấy `"password": "admin123"`.
+- **Kết quả mong đợi:** Password hash (bcrypt/SHA-256), so sánh server-side.
+- **Kết quả thực tế:** Password lộ hoàn toàn qua API.
+- **Mức độ:** 🔴 **Critical**
 
 ---
 
-## 3. Kiểm tra Edge Cases & Logic
+### 🐛 [BUG-002] Crash khi truy cập `/checkout` chưa đăng nhập
 
-✅ **Passed (Đã vượt qua):**
-* **Số lượng giỏ hàng:** Nút giảm số lượng (`-`) hoạt động tốt, đã bị disable hoặc chặn không cho phép giảm xuống dưới `1`. Không thể thêm số lượng âm thông qua giao diện.
-* **Đăng nhập sai:** Nhập sai email hoặc sai mật khẩu đều bị hệ thống từ chối thành công.
-
-⚠️ **Cần kiểm tra thêm (Back-end Logic):**
-* Dù giao diện không cho phép giảm dưới 1, nhưng nếu gửi API trực tiếp (bằng Postman) với `quantity: -5`, hệ thống (json-server) có thể vẫn chấp nhận. Khuyến nghị thêm logic kiểm tra `quantity > 0` trước khi lưu vào database.
-
----
-
-## 4. Hiệu năng & Bảo mật (Performance & Security)
-
-* **Hiệu năng:** Tốc độ phản hồi từ lúc click nút "Thêm vào giỏ hàng" đến khi giỏ hàng cập nhật là tức thời. Điều hướng trang bằng React Router mượt mà, không bị chớp trang (reload).
-* **Bảo mật:** 
-  * Chức năng tìm kiếm chưa lọc kỹ thẻ HTML. Nếu người dùng nhập `<script>alert(1)</script>` vào ô tìm kiếm, dù React mặc định chống XSS tốt, nhưng vẫn cần chú ý nếu sử dụng `dangerouslySetInnerHTML` ở đâu đó.
-  * Việc lưu trữ thông tin User/Phiên đăng nhập hiện tại nếu chỉ dựa vào LocalStorage mà không mã hóa (hoặc JWT token) sẽ dễ bị tấn công đánh cắp session.
+- **Mô tả:** `Checkout.jsx` dòng 48 truy cập `user.id` khi đặt hàng, nhưng không guard `user !== null`. Truy cập thẳng URL `/checkout` khi chưa đăng nhập gây `TypeError`.
+- **Bước tái hiện:** Chưa đăng nhập → thêm sách → truy cập `/checkout` → nhấn "Đặt hàng" → lỗi runtime.
+- **Kết quả mong đợi:** Redirect về `/login`.
+- **Kết quả thực tế:** Crash với `Cannot read properties of null`.
+- **Mức độ:** 🟠 **High**
 
 ---
 
-## 💡 Đề xuất cải thiện (Recommendations)
+### 🐛 [BUG-003] Regex SĐT không nhất quán giữa Checkout và Register
 
-1. **Bổ sung Form Validation:** Cài đặt thư viện như `Formik` và `Yup` (hoặc `react-hook-form`) để kiểm tra chặt chẽ định dạng Email và Regex cho Số điện thoại Việt Nam trước khi cho phép submit.
-2. **Cải thiện luồng Checkout:** Thêm trang `Checkout Success` kèm theo Mã Đơn Hàng (Order ID) để tăng độ uy tín và tạo cảm giác an tâm cho khách mua.
-3. **Phát triển Mobile UI:** Sử dụng Media Queries trong CSS hoặc thư viện UI (như Tailwind, Bootstrap, Material-UI) để xây dựng Drawer/Hamburger Menu cho màn hình thiết bị di động.
-4. **Kiểm tra dữ liệu đầu vào:** Ở phía API (hoặc middleware), luôn phải kiểm tra `quantity > 0` và sách còn trong kho hay không trước khi tạo đơn hàng.
+- **Mô tả:** Checkout dùng `^(0|\+84)[3|5|7|8|9][0-9]{8}$` (hỗ trợ +84), Register dùng `/^0\d{9}$/` (chỉ 0xxx). Hai tiêu chuẩn khác nhau gây UX không đồng nhất.
+- **Kết quả mong đợi:** Một bộ regex dùng chung.
+- **Mức độ:** 🟡 **Medium**
 
 ---
-*Báo cáo được thực hiện bởi hệ thống kiểm thử tự động. Vui lòng kiểm tra lại trên môi trường thực tế để xác nhận các bản vá lỗi.*
+
+### 🐛 [BUG-004] Đăng xuất không xóa giỏ hàng
+
+- **Mô tả:** `AuthContext.jsx` `logout()` chỉ xóa `bookstore_user`, không xóa `bookstore_cart`. User khác đăng nhập cùng máy sẽ thấy giỏ hàng của người trước.
+- **Bước tái hiện:** User A thêm sách → đăng xuất → User B đăng nhập → thấy giỏ của A.
+- **Kết quả mong đợi:** `logout()` gọi `clearCart()`.
+- **Mức độ:** 🟠 **High**
+
+---
+
+## 🛒 NHÓM 2: Giỏ hàng
+
+### 🐛 [BUG-005] Thêm sách hết hàng vào giỏ từ BookCard
+
+- **Mô tả:** `BookCard.jsx` gọi `addToCart(book)` không kiểm tra `stock`. `CartContext.addToCart` cũng không validate stock. Sách `stock=0` vẫn được thêm vào giỏ.
+- **Bước tái hiện:** Set `stock: 0` cho một sách → nhấn "Thêm vào giỏ" ở trang danh sách → thêm thành công.
+- **Kết quả mong đợi:** Nút bị disable hoặc toast lỗi khi `stock = 0`.
+- **Mức độ:** 🟠 **High**
+
+---
+
+### 🐛 [BUG-006] Mã giảm giá bị mất khi sang trang Checkout
+
+- **Mô tả:** `Cart.jsx` tính `finalTotal = cartTotal * 0.9` khi áp mã `BOOKVERSE10`. Tuy nhiên `Checkout.jsx` tính lại `total = cartTotal + shipping` từ `cartTotal` gốc của Context — **không nhận giảm giá**. Đơn hàng được lưu với giá chưa giảm.
+- **Bước tái hiện:**
+  1. Thêm sách → áp mã `BOOKVERSE10` → giỏ hiển thị giảm 10%.
+  2. Chuyển sang Checkout → tổng tiền **trở về giá gốc**.
+  3. Đặt hàng → `total` trong DB không trừ giảm giá.
+- **Kết quả mong đợi:** Giảm giá được truyền sang Checkout và lưu vào đơn hàng.
+- **Mức độ:** 🔴 **Critical**
+
+---
+
+### 🐛 [BUG-007] Mã giảm giá không có điều kiện tối thiểu
+
+- **Mô tả:** `BOOKVERSE10` áp dụng cho mọi đơn dù chỉ 1đ, không có ngưỡng tối thiểu, không giới hạn số lần dùng.
+- **Mức độ:** 🟡 **Medium**
+
+---
+
+### 🐛 [BUG-008] Thêm nhiều lần từ BookCard vượt tồn kho
+
+- **Mô tả:** `CartContext.addToCart` cộng dồn `item.quantity + quantity` không kiểm tra giới hạn stock. Nhấn "Thêm vào giỏ" nhiều lần từ BookCard dẫn đến `quantity > stock`.
+- **Bước tái hiện:** Sách `stock: 2` → nhấn "Thêm vào giỏ" 3 lần → giỏ hiển thị qty=3.
+- **Kết quả mong đợi:** `addToCart` kiểm tra `Math.min(stock, existing.quantity + quantity)`.
+- **Mức độ:** 🟠 **High**
+
+---
+
+## 💰 NHÓM 3: Giá và Thanh toán
+
+### 🐛 [BUG-009] Total đơn hàng cũ không nhất quán trong DB
+
+- **Mô tả:** Nhiều đơn trong `db.json` có `total` không khớp logic hiện tại:
+  - Đơn `cbxGLz0aoA8`: tổng hàng 447.000đ < 300.000đ ngưỡng miễn ship → phải 477.000đ, nhưng lưu 447.000đ (thiếu ship).
+  - Đơn `4w4PGWgMky4` & `hvuymiqYAmw`: phone = `"abc"`, `"agfgag"` — dữ liệu bẩn do bug cũ.
+  - Đơn `aM-XNWZXOUk`: `phone: "09012345670901234567"` (20 ký tự — nhập đôi).
+- **Kết quả mong đợi:** Làm sạch DB, total nhất quán.
+- **Mức độ:** 🟡 **Medium**
+
+---
+
+## 📦 NHÓM 4: Sản phẩm & Tồn kho
+
+### 🐛 [BUG-010] `categoryId` không đồng nhất kiểu dữ liệu
+
+- **Mô tả:** Sách id=`11` có `categoryId: 4` (số nguyên), các sách khác có `categoryId: [4]` (mảng). Code xử lý cả hai nhưng dữ liệu không chuẩn hóa có thể gây lọc sai nếu thêm sách mới qua Admin.
+- **Kết quả mong đợi:** Tất cả sách dùng `categoryId: number[]`.
+- **Mức độ:** 🟡 **Medium**
+
+---
+
+### 🐛 [BUG-011] Wishlist không được lưu trữ
+
+- **Mô tả:** `BookDetail.jsx` dùng `useState(false)` cho wishlist — mất sau refresh.
+- **Bước tái hiện:** Nhấn "Yêu thích" → refresh → trạng thái reset.
+- **Kết quả mong đợi:** Lưu vào localStorage hoặc DB.
+- **Mức độ:** 🟢 **Low**
+
+---
+
+## 🔍 NHÓM 5: Tìm kiếm & Lọc
+
+### 🐛 [BUG-012] Tìm kiếm không hỗ trợ gõ không dấu
+
+- **Mô tả:** `Books.jsx` dòng 51 dùng `toLowerCase().includes()` — không normalize Unicode. Gõ `"dac nhan tam"` không tìm được "Đắc Nhân Tâm".
+- **Fix đề xuất:** `str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()`
+- **Mức độ:** 🟠 **High**
+
+---
+
+### 🐛 [BUG-013] Không reset trang khi đổi filter bằng thao tác thủ công
+
+- **Mô tả:** Khi đang ở trang 3, thay đổi filter giá → `useEffect` reset page sau 300ms debounce, trong khoảng đó hiển thị có thể sai offset.
+- **Mức độ:** 🟢 **Low**
+
+---
+
+## 📋 NHÓM 6: Trạng thái đơn hàng
+
+### 🐛 [BUG-014] Admin có thể đảo ngược trạng thái đơn tùy ý
+
+- **Mô tả:** Không có kiểm tra luồng trạng thái hợp lệ. Admin có thể chuyển đơn `delivered` → `pending`.
+- **Kết quả mong đợi:** Chỉ cho phép tiến: `pending→confirmed→shipping→delivered`, và `*→cancelled`.
+- **Mức độ:** 🟡 **Medium**
+
+---
+
+### 🐛 [BUG-015] Đơn hàng guest (userId: null) xuất hiện trong hệ thống
+
+- **Mô tả:** Đơn `qPZTo1mlkko` có `userId: null` — tạo bởi user chưa đăng nhập (do bug cũ của Checkout). Đơn này không thuộc về ai, không hiển thị trong Orders page của bất kỳ user nào.
+- **Mức độ:** 🟡 **Medium**
+
+---
+
+## 📊 Bảng tổng hợp
+
+| ID | Tên lỗi | Nhóm | Mức độ |
+|----|---------|------|--------|
+| BUG-001 | Password lưu plaintext | Tài khoản | 🔴 Critical |
+| BUG-002 | Crash checkout chưa đăng nhập | Tài khoản | 🟠 High |
+| BUG-003 | Regex SĐT không nhất quán | Tài khoản | 🟡 Medium |
+| BUG-004 | Logout không xóa giỏ hàng | Tài khoản | 🟠 High |
+| BUG-005 | Thêm sách hết hàng vào giỏ | Giỏ hàng | 🟠 High |
+| BUG-006 | Mã giảm giá mất khi sang Checkout | Giỏ hàng | 🔴 Critical |
+| BUG-007 | Mã giảm giá không điều kiện | Giỏ hàng | 🟡 Medium |
+| BUG-008 | Thêm nhiều lần vượt tồn kho | Giỏ hàng | 🟠 High |
+| BUG-009 | Total đơn cũ không nhất quán | Thanh toán | 🟡 Medium |
+| BUG-010 | categoryId sai kiểu dữ liệu | Sản phẩm | 🟡 Medium |
+| BUG-011 | Wishlist không lưu trữ | Sản phẩm | 🟢 Low |
+| BUG-012 | Tìm kiếm không hỗ trợ không dấu | Tìm kiếm | 🟠 High |
+| BUG-013 | Không reset page khi đổi filter | Tìm kiếm | 🟢 Low |
+| BUG-014 | Admin đảo ngược trạng thái đơn | Đơn hàng | 🟡 Medium |
+| BUG-015 | Đơn hàng guest userId null | Đơn hàng | 🟡 Medium |
+
+---
+
+## ✅ Điểm hoạt động đúng
+
+- ✅ Phí ship: miễn phí khi đơn ≥ 300.000đ (Checkout + Cart nhất quán).
+- ✅ Format giá VND chuẩn (`Intl.NumberFormat`).
+- ✅ % giảm giá tính đúng (`getDiscount`).
+- ✅ Nút "+" ở Cart disable khi đạt stock.
+- ✅ BookDetail giới hạn qty theo stock (`Math.min`).
+- ✅ Checkout validate regex SĐT.
+- ✅ Chặn email trùng khi đăng ký.
+- ✅ Giỏ hàng persist qua localStorage.
+- ✅ Redirect `/cart` khi giỏ trống mà vào `/checkout`.
+- ✅ Lịch sử đơn hàng lọc đúng theo `userId`.
+
+---
+
+## 🔧 Ưu tiên sửa ngay
+
+1. **BUG-006** — Truyền `discountedTotal` sang Checkout qua Context hoặc URL param.
+2. **BUG-005 + BUG-008** — Thêm kiểm tra stock vào `addToCart()` của CartContext.
+3. **BUG-004** — Gọi `clearCart()` trong `logout()`.
+4. **BUG-012** — Normalize chuỗi tìm kiếm.
+5. **BUG-002** — Guard `if (!user) return <Navigate to="/login" />` đầu Checkout.

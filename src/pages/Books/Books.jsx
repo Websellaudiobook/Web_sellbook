@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { FiSearch, FiFilter, FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi'
-import { getBooks, getCategories } from '../../services/api'
+import { getBooks, getCategories, getReviews } from '../../services/api'
+import { enrichBooksWithReviewStats } from '../../utils/helpers'
 import BookCard from '../../components/BookCard/BookCard'
 import { SkeletonBookGrid } from '../../components/Skeleton/Skeleton'
 import useDebounce from '../../hooks/useDebounce'
@@ -15,18 +16,27 @@ export default function Books() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('categoryId') || '')
+  const [featuredOnly, setFeaturedOnly] = useState(searchParams.get('featured') === 'true')
+  const [bestsellerOnly, setBestsellerOnly] = useState(searchParams.get('bestseller') === 'true')
   const [sortBy, setSortBy] = useState('newest')
   const [priceRange, setPriceRange] = useState('all')
+  const [stockFilter, setStockFilter] = useState('all')
+  const [ratingFilter, setRatingFilter] = useState('all')
+  const [selectedAuthor, setSelectedAuthor] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [filterOpen, setFilterOpen] = useState(false)
 
   const debouncedSearch = useDebounce(search, 300)
+  const authors = useMemo(() => {
+    return [...new Set(books.map(book => book.author).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b))
+  }, [books])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [booksRes, catsRes] = await Promise.all([getBooks(), getCategories()])
-        setBooks(booksRes.data)
+        const [booksRes, catsRes, reviewsRes] = await Promise.all([getBooks(), getCategories(), getReviews()])
+        setBooks(enrichBooksWithReviewStats(booksRes.data, reviewsRes.data))
         setCategories(catsRes.data)
       } catch (err) {
         console.error(err)
@@ -40,6 +50,8 @@ export default function Books() {
   useEffect(() => {
     setSearch(searchParams.get('search') || '')
     setSelectedCategory(searchParams.get('categoryId') || '')
+    setFeaturedOnly(searchParams.get('featured') === 'true')
+    setBestsellerOnly(searchParams.get('bestseller') === 'true')
     setCurrentPage(1)
   }, [searchParams])
 
@@ -54,12 +66,20 @@ export default function Books() {
       })
       .filter(book => {
         if (selectedCategory) {
-          const catId = parseInt(selectedCategory)
+          const catId = String(selectedCategory)
           if (Array.isArray(book.categoryId)) {
-            return book.categoryId.includes(catId)
+            return book.categoryId.map(id => String(id)).includes(catId)
           }
-          return book.categoryId === catId
+          return String(book.categoryId) === catId
         }
+        return true
+      })
+      .filter(book => {
+        if (featuredOnly) return !!book.featured
+        return true
+      })
+      .filter(book => {
+        if (bestsellerOnly) return !!book.bestseller
         return true
       })
       .filter(book => {
@@ -68,14 +88,31 @@ export default function Books() {
         if (priceRange === 'over200') return book.price > 200000
         return true
       })
+      .filter(book => {
+        if (stockFilter === 'inStock') return Number(book.stock || 0) > 0
+        if (stockFilter === 'lowStock') return Number(book.stock || 0) > 0 && Number(book.stock || 0) <= 10
+        if (stockFilter === 'outOfStock') return Number(book.stock || 0) <= 0
+        return true
+      })
+      .filter(book => {
+        if (ratingFilter === 'all') return true
+        return Number(book.averageRating || 0) >= Number(ratingFilter)
+      })
+      .filter(book => {
+        if (!selectedAuthor) return true
+        return book.author === selectedAuthor
+      })
       .sort((a, b) => {
         if (sortBy === 'price-asc') return a.price - b.price
         if (sortBy === 'price-desc') return b.price - a.price
-        if (sortBy === 'rating') return b.rating - a.rating
+        if (sortBy === 'rating') {
+          if (b.averageRating !== a.averageRating) return b.averageRating - a.averageRating
+          return b.totalReviews - a.totalReviews
+        }
         if (sortBy === 'name') return a.title.localeCompare(b.title)
         return new Date(b.createdAt) - new Date(a.createdAt)
       })
-  }, [books, debouncedSearch, selectedCategory, priceRange, sortBy])
+  }, [books, debouncedSearch, selectedCategory, priceRange, stockFilter, ratingFilter, selectedAuthor, sortBy])
 
   // Pagination
   const totalPages = Math.ceil(filteredBooks.length / BOOKS_PER_PAGE)
@@ -87,10 +124,19 @@ export default function Books() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [debouncedSearch, selectedCategory, priceRange, sortBy])
+  }, [debouncedSearch, selectedCategory, priceRange, stockFilter, ratingFilter, selectedAuthor, sortBy])
 
   // Active filters count for mobile badge
-  const activeFilters = [selectedCategory, priceRange !== 'all' ? priceRange : '', debouncedSearch].filter(Boolean).length
+  const activeFilters = [
+    selectedCategory,
+    priceRange !== 'all' ? priceRange : '',
+    stockFilter !== 'all' ? stockFilter : '',
+    ratingFilter !== 'all' ? ratingFilter : '',
+    selectedAuthor,
+    debouncedSearch,
+    featuredOnly ? 'featured' : '',
+    bestsellerOnly ? 'bestseller' : ''
+  ].filter(Boolean).length
 
   if (loading) {
     return (
@@ -171,6 +217,52 @@ export default function Books() {
                 </button>
               ))}
             </div>
+
+            <div className="filter-group">
+              <h3 className="filter-title">Tác giả</h3>
+              <select className="form-select filter-select" value={selectedAuthor} onChange={e => setSelectedAuthor(e.target.value)}>
+                <option value="">Tất cả tác giả</option>
+                {authors.map(author => (
+                  <option key={author} value={author}>{author}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <h3 className="filter-title">Tồn kho</h3>
+              {[
+                { value: 'all', label: 'Tất cả' },
+                { value: 'inStock', label: 'Còn hàng' },
+                { value: 'lowStock', label: 'Sắp hết hàng' },
+                { value: 'outOfStock', label: 'Hết hàng' }
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  className={`filter-option ${stockFilter === opt.value ? 'active' : ''}`}
+                  onClick={() => setStockFilter(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="filter-group">
+              <h3 className="filter-title">Đánh giá</h3>
+              {[
+                { value: 'all', label: 'Tất cả' },
+                { value: '5', label: 'Từ 5 sao' },
+                { value: '4', label: 'Từ 4 sao' },
+                { value: '3', label: 'Từ 3 sao' }
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  className={`filter-option ${ratingFilter === opt.value ? 'active' : ''}`}
+                  onClick={() => setRatingFilter(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </aside>
 
           {/* Books Grid */}
@@ -190,7 +282,13 @@ export default function Books() {
                 <h3 className="empty-state-title">Không tìm thấy sách</h3>
                 <p className="empty-state-text">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
                 <button className="btn btn-secondary" onClick={() => {
-                  setSearch(''); setSelectedCategory(''); setPriceRange('all'); setSortBy('newest')
+                  setSearch('')
+                  setSelectedCategory('')
+                  setPriceRange('all')
+                  setStockFilter('all')
+                  setRatingFilter('all')
+                  setSelectedAuthor('')
+                  setSortBy('newest')
                 }}>
                   Xóa bộ lọc
                 </button>

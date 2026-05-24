@@ -35,5 +35,7 @@ export const PRICE_RANGES = [
 // ===== LOCAL STORAGE KEYS =====
 export const STORAGE_KEYS = {
   USER: 'bookstore_user',
-  CART: 'bookstore_cart'
+  CART: 'bookstore_cart',
+  WISHLIST: 'bookstore_wishlist',
+  CHECKOUT_DISCOUNT: 'bookstore_checkout_discount'
 }

@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowRight, FiShoppingCart } from 'react-icons/fi'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { getDiscounts } from '../../services/api'
 import { formatPrice } from '../../utils/helpers'
-import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD } from '../../utils/constants'
+import { SHIPPING_FEE, FREE_SHIPPING_THRESHOLD, STORAGE_KEYS } from '../../utils/constants'
 import { toast } from 'react-toastify'
 import './Cart.css'
 
@@ -13,19 +14,37 @@ export default function Cart() {
   const { user } = useAuth()
   const [discountCode, setDiscountCode] = useState('')
   const [discountApplied, setDiscountApplied] = useState(false)
+  const [discountPercent, setDiscountPercent] = useState(0)
 
-  const handleApplyDiscount = () => {
-    if (!discountCode.trim()) return;
-    if (discountCode.trim().toUpperCase() === 'BOOKVERSE10') {
-      setDiscountApplied(true);
-      toast.success('Áp dụng mã giảm giá thành công!');
-    } else {
-      toast.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!');
-      setDiscountApplied(false);
+  const handleApplyDiscount = async () => {
+    const code = discountCode.trim().toUpperCase()
+    if (!code) return
+    try {
+      const res = await getDiscounts()
+      const match = res.data.find(d => String(d.code || '').toUpperCase() === code)
+      const isExpired = match?.expiresAt ? new Date(match.expiresAt) < new Date() : false
+      if (!match || match.active === false || isExpired) {
+        toast.error('Mã giảm giá không hợp lệ hoặc đã hết hạn!')
+        setDiscountApplied(false)
+        setDiscountPercent(0)
+        localStorage.removeItem(STORAGE_KEYS.CHECKOUT_DISCOUNT)
+        return
+      }
+      const percent = Number(match.percent) || 0
+      setDiscountApplied(true)
+      setDiscountPercent(percent)
+      localStorage.setItem(STORAGE_KEYS.CHECKOUT_DISCOUNT, JSON.stringify({
+        code: match.code,
+        percent,
+        appliedAt: new Date().toISOString()
+      }))
+      toast.success('Áp dụng mã giảm giá thành công!')
+    } catch (err) {
+      toast.error(err.friendlyMessage || 'Không thể áp dụng mã giảm giá')
     }
   }
 
-  const finalTotal = discountApplied ? cartTotal * 0.9 : cartTotal;
+  const finalTotal = discountApplied ? cartTotal * (1 - discountPercent / 100) : cartTotal
 
   if (cartItems.length === 0) {
     return (
@@ -120,7 +139,7 @@ export default function Cart() {
                 </div>
                 {discountApplied && (
                   <p style={{ color: 'var(--success-color)', fontSize: '14px', marginTop: '8px' }}>
-                    Đã giảm 10% trên tổng giá trị sách
+                    Đã giảm {discountPercent}% trên tổng giá trị sách
                   </p>
                 )}
               </div>

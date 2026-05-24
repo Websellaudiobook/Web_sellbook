@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FiShoppingCart, FiUser, FiLogOut, FiMenu, FiX, FiSearch, FiSettings, FiBookOpen, FiHome, FiGrid, FiClock } from 'react-icons/fi'
+import { FiShoppingCart, FiUser, FiHeart, FiLogOut, FiMenu, FiX, FiSearch, FiSettings, FiBookOpen, FiHome, FiGrid, FiClock } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCart } from '../../contexts/CartContext'
 import './Header.css'
@@ -87,6 +87,12 @@ export default function Header() {
 
                 {userMenuOpen && (
                   <div className="user-dropdown">
+                    <Link to="/profile" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                      <FiUser /> Thông tin tài khoản
+                    </Link>
+                    <Link to="/wishlist" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                      <FiHeart /> Sách yêu thích
+                    </Link>
                     <Link to="/orders" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
                       <FiClock /> Lịch sử mua hàng
                     </Link>

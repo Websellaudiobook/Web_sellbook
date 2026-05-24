@@ -1,12 +1,18 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FiShoppingCart, FiStar, FiEye } from 'react-icons/fi'
 import { useCart } from '../../contexts/CartContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice, getDiscount } from '../../utils/helpers'
+import { toast } from 'react-toastify'
 import './BookCard.css'
 
 export default function BookCard({ book }) {
+  const navigate = useNavigate()
   const { addToCart } = useCart()
+  const { user } = useAuth()
   const discount = getDiscount(book.price, book.originalPrice)
+  const averageRating = Number(book.averageRating || 0)
+  const totalReviews = Number(book.totalReviews || 0)
 
   return (
     <div className="book-card card">
@@ -27,7 +33,17 @@ export default function BookCard({ book }) {
           <Link to={`/books/${book.id}`} className="overlay-btn">
             <FiEye /> Xem chi tiết
           </Link>
-          <button onClick={() => addToCart(book)} className="overlay-btn overlay-btn-cart">
+          <button
+            onClick={() => {
+              if (!user) {
+                toast.info('Vui lòng đăng nhập để thêm vào giỏ hàng')
+                navigate('/login')
+                return
+              }
+              addToCart(book)
+            }}
+            className="overlay-btn overlay-btn-cart"
+          >
             <FiShoppingCart /> Thêm vào giỏ
           </button>
         </div>
@@ -42,12 +58,12 @@ export default function BookCard({ book }) {
             {[1, 2, 3, 4, 5].map(i => (
               <FiStar
                 key={i}
-                className={`star ${i <= Math.round(book.rating) ? '' : 'empty'}`}
-                fill={i <= Math.round(book.rating) ? '#f59e0b' : 'none'}
+                className={`star ${i <= Math.round(averageRating) ? '' : 'empty'}`}
+                fill={i <= Math.round(averageRating) ? '#f59e0b' : 'none'}
               />
             ))}
           </div>
-          <span className="rating-count">({book.reviews})</span>
+          <span className="rating-count">({totalReviews})</span>
         </div>
         <div className="book-card-price">
           <span className="price">{formatPrice(book.price)}</span>

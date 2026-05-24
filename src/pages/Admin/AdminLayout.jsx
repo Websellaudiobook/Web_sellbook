@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { FiBook, FiUsers, FiGrid, FiShoppingBag, FiHome, FiBarChart2, FiSettings, FiMenu, FiX, FiLogOut } from 'react-icons/fi'
+import { FiBook, FiUsers, FiGrid, FiShoppingBag, FiHome, FiBarChart2, FiSettings, FiMenu, FiX, FiLogOut, FiTag, FiMail, FiMessageSquare } from 'react-icons/fi'
 import { useAuth } from '../../contexts/AuthContext'
 import './Admin.css'
 
@@ -59,6 +59,15 @@ export default function AdminLayout() {
             </NavLink>
             <NavLink to="/admin/users" className="admin-nav-link">
               <FiUsers /> Tài khoản
+            </NavLink>
+            <NavLink to="/admin/discounts" className="admin-nav-link">
+              <FiTag /> Mã giảm giá
+            </NavLink>
+            <NavLink to="/admin/subscribers" className="admin-nav-link">
+              <FiMail /> Email nhận tin
+            </NavLink>
+            <NavLink to="/admin/reviews" className="admin-nav-link">
+              <FiMessageSquare /> Đánh giá
             </NavLink>
           </div>
 

@@ -81,6 +81,10 @@
   font-weight: 600;
 }
 
+.filter-select {
+  width: 100%;
+}
+
 /* Toolbar */
 .books-toolbar {
   display: flex;
