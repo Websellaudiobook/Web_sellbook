@@ -7,6 +7,7 @@ import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop/ScrollToTop'
+import ThemeCustomizer from './components/ThemeCustomizer/ThemeCustomizer'
 
 import { useAuth } from './contexts/AuthContext'
 
@@ -60,11 +61,17 @@ export default function App() {
   const { loading } = useAuth()
 
   if (loading) {
-    return <PageLoader />
+    return (
+      <>
+        <PageLoader />
+        <ThemeCustomizer />
+      </>
+    )
   }
 
   return (
     <>
+      <ThemeCustomizer />
       <ToastContainer
         position="top-right"
         autoClose={3000}
