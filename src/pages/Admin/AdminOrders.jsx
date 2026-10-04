@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiShoppingBag, FiEdit2 } from 'react-icons/fi'
+import { FiShoppingBag, FiEdit2, FiAlertCircle, FiSearch } from 'react-icons/fi'
 import { getOrders, updateOrder, getBook, updateBook, getReviews } from '../../services/api'
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/helpers'
 import { toast } from 'react-toastify'
@@ -12,6 +12,7 @@ export default function AdminOrders() {
   const [reviews, setReviews] = useState([])
   const [editOrder, setEditOrder] = useState(null)
   const [newStatus, setNewStatus] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
 
   const fetchData = async () => {
     const [ordersRes, reviewsRes] = await Promise.all([getOrders(), getReviews()])
@@ -97,6 +98,16 @@ export default function AdminOrders() {
     <div className="page-enter">
       <div className="admin-page-header">
         <h1 className="admin-page-title"><FiShoppingBag /> Quản lý đơn hàng</h1>
+        <div className="admin-search-box">
+          <FiSearch className="admin-search-icon" />
+          <input
+            type="text"
+            className="form-input"
+            placeholder="Tìm theo mã đơn hàng..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="table-container">
@@ -104,6 +115,7 @@ export default function AdminOrders() {
           <thead>
             <tr>
               <th>STT</th>
+              <th>Mã đơn</th>
               <th>Sản phẩm</th>
               <th>Tổng tiền</th>
               <th>Thanh toán</th>
@@ -113,9 +125,12 @@ export default function AdminOrders() {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => (
+            {orders
+              .filter(order => searchTerm.trim() === '' || String(order.id).toLowerCase().includes(searchTerm.trim().toLowerCase()))
+              .map((order, index) => (
               <tr key={order.id}>
                 <td>{index + 1}</td>
+                <td><span className="order-id-cell">#{order.id}</span></td>
                 <td>
                   <div style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {order.items.map(i => `${i.title} (x${i.quantity})`).join(', ')}
@@ -131,6 +146,12 @@ export default function AdminOrders() {
                   <span className={`badge badge-${getStatusColor(order.status)}`}>
                     {getStatusLabel(order.status)}
                   </span>
+                  {order.status === 'cancelled' && order.cancelReason && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--error)', marginTop: 4, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={order.cancelReason}>
+                      <FiAlertCircle style={{ verticalAlign: 'middle', marginRight: 3, fontSize: '0.7rem' }} />
+                      {order.cancelReason}
+                    </div>
+                  )}
                 </td>
                 <td>{formatDate(order.createdAt)}</td>
                 <td>
@@ -168,7 +189,28 @@ export default function AdminOrders() {
                   <p style={{ color: 'var(--text-secondary)', marginBottom: 4 }}><strong>Ngày đặt:</strong> {formatDate(editOrder.createdAt)}</p>
                 </div>
               </div>
-              
+
+              {editOrder.status === 'cancelled' && editOrder.cancelReason && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: 16,
+                  marginBottom: 20
+                }}>
+                  <h4 style={{ color: 'var(--error)', marginBottom: 8, fontSize: '0.85rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <FiAlertCircle /> Lý do hủy đơn hàng
+                  </h4>
+                  <p style={{ color: 'var(--text-primary)', lineHeight: 1.6, marginBottom: 4 }}>{editOrder.cancelReason}</p>
+                  {editOrder.cancelledBy && (
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', fontStyle: 'italic' }}>
+                      Hủy bởi: {editOrder.cancelledBy === 'customer' ? 'Khách hàng' : 'Quản trị viên'}
+                      {editOrder.cancelledAt && ` — ${formatDate(editOrder.cancelledAt)}`}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <h4 style={{ color: 'var(--text-muted)', marginBottom: 8, fontSize: '0.85rem', textTransform: 'uppercase' }}>Sản phẩm đã mua</h4>
               <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: 16 }}>
                 {editOrder.items.map((item, idx) => (
@@ -195,21 +237,45 @@ export default function AdminOrders() {
                 </div>
               </div>
             </div>
-            <div className="form-group">
-              <label className="form-label">Trạng thái đơn hàng</label>
-              <select
-                className="form-select"
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-              >
-                {ORDER_STATUSES.map(s => (
-                  <option key={s} value={s}>{getStatusLabel(s)}</option>
-                ))}
-              </select>
-            </div>
+            {editOrder.status === 'cancelled' || editOrder.status === 'delivered' ? (
+              <div style={{
+                padding: '14px 18px',
+                background: editOrder.status === 'cancelled' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)',
+                border: `1px solid ${editOrder.status === 'cancelled' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                borderRadius: 'var(--radius-md)',
+                marginBottom: 16,
+                fontSize: '0.9rem',
+                color: editOrder.status === 'cancelled' ? 'var(--error)' : 'var(--success)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                <FiAlertCircle />
+                {editOrder.status === 'cancelled'
+                  ? `Đơn hàng đã bị hủy${editOrder.cancelledBy === 'customer' ? ' bởi khách hàng' : ''}, không thể thay đổi trạng thái.`
+                  : 'Đơn hàng đã giao thành công, không thể thay đổi trạng thái.'}
+              </div>
+            ) : (
+              <div className="form-group">
+                <label className="form-label">Trạng thái đơn hàng</label>
+                <select
+                  className="form-select"
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                >
+                  {ORDER_STATUSES.filter(s => s !== 'cancelled' && s !== 'delivered').map(s => (
+                    <option key={s} value={s}>{getStatusLabel(s)}</option>
+                  ))}
+                  <option value="delivered">{getStatusLabel('delivered')}</option>
+                  <option value="cancelled">{getStatusLabel('cancelled')}</option>
+                </select>
+              </div>
+            )}
             <div className="admin-form-actions">
-              <button className="btn btn-secondary" onClick={() => setEditOrder(null)}>Hủy</button>
-              <button className="btn btn-primary" onClick={handleStatusUpdate}>Cập nhật</button>
+              <button className="btn btn-secondary" onClick={() => setEditOrder(null)}>Đóng</button>
+              {editOrder.status !== 'cancelled' && editOrder.status !== 'delivered' && (
+                <button className="btn btn-primary" onClick={handleStatusUpdate}>Cập nhật</button>
+              )}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiPackage, FiClock, FiX, FiEye, FiMapPin, FiPhone, FiCreditCard } from 'react-icons/fi'
+import { FiPackage, FiClock, FiX, FiEye, FiMapPin, FiPhone, FiCreditCard, FiAlertCircle } from 'react-icons/fi'
 import { getOrders, updateOrder, getBook, updateBook } from '../../services/api'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatPrice, formatDate, getStatusLabel, getStatusColor } from '../../utils/helpers'
@@ -13,6 +13,19 @@ export default function Orders() {
   const [loading, setLoading] = useState(true)
   const [cancellingId, setCancellingId] = useState(null)
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [cancelModal, setCancelModal] = useState(null)
+  const [cancelReason, setCancelReason] = useState('')
+  const [customReason, setCustomReason] = useState('')
+
+  const CANCEL_REASONS = [
+    'Tôi muốn thay đổi sản phẩm trong đơn hàng',
+    'Tôi tìm thấy giá rẻ hơn ở nơi khác',
+    'Tôi không còn nhu cầu mua nữa',
+    'Tôi đặt nhầm sản phẩm',
+    'Thời gian giao hàng quá lâu',
+    'Tôi muốn thay đổi địa chỉ giao hàng',
+    'other'
+  ]
 
   const fetchOrders = async () => {
     try {
@@ -32,13 +45,25 @@ export default function Orders() {
 
   const canCancelOrder = (status) => ['pending', 'confirmed'].includes(status)
 
-  const handleCancelOrder = async (order) => {
+  const openCancelModal = (order) => {
     if (!canCancelOrder(order.status)) {
       toast.info('Chỉ có thể hủy đơn hàng đang chờ xác nhận hoặc đã xác nhận')
       return
     }
+    setCancelModal(order)
+    setCancelReason('')
+    setCustomReason('')
+  }
 
-    if (!window.confirm('Bạn chắc chắn muốn hủy đơn hàng này?')) return
+  const handleCancelOrder = async () => {
+    const order = cancelModal
+    if (!order) return
+
+    const finalReason = cancelReason === 'other' ? customReason.trim() : cancelReason
+    if (!finalReason) {
+      toast.warning('Vui lòng chọn hoặc nhập lý do hủy đơn hàng')
+      return
+    }
 
     setCancellingId(order.id)
     const restoredBooks = []
@@ -58,7 +83,9 @@ export default function Orders() {
         await updateOrder(order.id, {
           ...order,
           status: 'cancelled',
-          cancelledAt: new Date().toISOString()
+          cancelledAt: new Date().toISOString(),
+          cancelReason: finalReason,
+          cancelledBy: 'customer'
         })
       } catch (err) {
         await Promise.allSettled(
@@ -72,6 +99,7 @@ export default function Orders() {
         throw err
       }
       toast.success('Đã hủy đơn hàng và hoàn lại tồn kho')
+      setCancelModal(null)
       fetchOrders()
     } catch (err) {
       toast.error(err.friendlyMessage || 'Không thể hủy đơn hàng, vui lòng thử lại')
@@ -133,7 +161,7 @@ export default function Orders() {
                     {canCancelOrder(order.status) && (
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() => handleCancelOrder(order)}
+                        onClick={() => openCancelModal(order)}
                         disabled={cancellingId === order.id}
                       >
                         <FiX /> {cancellingId === order.id ? 'Đang hủy...' : 'Hủy đơn'}
@@ -143,6 +171,12 @@ export default function Orders() {
                       Tổng: <strong>{formatPrice(order.total)}</strong>
                     </div>
                   </div>
+                {order.status === 'cancelled' && order.cancelReason && (
+                  <div className="order-cancel-reason-inline">
+                    <FiAlertCircle />
+                    <span>Lý do hủy: {order.cancelReason}</span>
+                  </div>
+                )}
                 </div>
               </div>
             ))}
@@ -176,6 +210,15 @@ export default function Orders() {
                   {selectedOrder.cancelledAt && <p>Hủy lúc: {formatDate(selectedOrder.cancelledAt)}</p>}
                   {selectedOrder.deliveredAt && <p>Giao lúc: {formatDate(selectedOrder.deliveredAt)}</p>}
                 </div>
+                {selectedOrder.status === 'cancelled' && selectedOrder.cancelReason && (
+                  <div className="order-detail-box order-cancel-reason-box">
+                    <h3><FiAlertCircle /> Lý do hủy đơn</h3>
+                    <p>{selectedOrder.cancelReason}</p>
+                    {selectedOrder.cancelledBy && (
+                      <p className="cancel-by-label">Hủy bởi: {selectedOrder.cancelledBy === 'customer' ? 'Khách hàng' : 'Quản trị viên'}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="order-detail-timeline">
@@ -215,6 +258,58 @@ export default function Orders() {
 
               <div className="modal-actions">
                 <button className="btn btn-secondary" onClick={() => setSelectedOrder(null)}>Đóng</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {cancelModal && (
+          <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setCancelModal(null)}>
+            <div className="modal-content cancel-reason-modal">
+              <h2 className="modal-title"><FiAlertCircle /> Hủy đơn hàng #{cancelModal.id}</h2>
+              <p className="cancel-modal-subtitle">Vui lòng cho chúng tôi biết lý do bạn muốn hủy đơn hàng này:</p>
+
+              <div className="cancel-reasons-list">
+                {CANCEL_REASONS.map((reason) => (
+                  <label
+                    key={reason}
+                    className={`cancel-reason-option${cancelReason === reason ? ' selected' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="cancelReason"
+                      value={reason}
+                      checked={cancelReason === reason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                    />
+                    <span className="cancel-reason-radio"></span>
+                    <span className="cancel-reason-text">
+                      {reason === 'other' ? 'Lý do khác' : reason}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              {cancelReason === 'other' && (
+                <textarea
+                  className="form-input cancel-custom-reason"
+                  placeholder="Nhập lý do hủy đơn hàng của bạn..."
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  rows={3}
+                  autoFocus
+                />
+              )}
+
+              <div className="modal-actions">
+                <button className="btn btn-secondary" onClick={() => setCancelModal(null)}>Quay lại</button>
+                <button
+                  className="btn btn-danger"
+                  onClick={handleCancelOrder}
+                  disabled={cancellingId === cancelModal.id || !cancelReason || (cancelReason === 'other' && !customReason.trim())}
+                >
+                  <FiX /> {cancellingId === cancelModal.id ? 'Đang hủy...' : 'Xác nhận hủy đơn'}
+                </button>
               </div>
             </div>
           </div>
